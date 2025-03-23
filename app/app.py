@@ -24,23 +24,50 @@ app.app_context().push()
 class Users(db.Model):
     __tablename__ = "Users"
     id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(String(100))
-    password: Mapped[str] = mapped_column(String(100))
+    username: Mapped[str] = mapped_column(String(32))
+    password: Mapped[str] = mapped_column(String(256))
     password_salt: Mapped[str] = mapped_column(String(100))
-    email: Mapped[str] = mapped_column(String(100))
+    email: Mapped[str] = mapped_column(String(32))
     address: Mapped[str] = mapped_column(String(100))
-    phone_number: Mapped[str] = mapped_column(String(100))
+    phone_number: Mapped[str] = mapped_column(String(32))
 
 class Roles(db.Model):
     __tablename__ = "Roles"
     id: Mapped[int] = mapped_column(primary_key=True)
-    role_name: Mapped[str] = mapped_column(String(100))
+    role_name: Mapped[str] = mapped_column(String(32))
 
-#class Rentals(db.Model):
-#    __tablename__ = "Rentals"
-#    carid: Mapped[int] = mapped_column(primary_key = True)
-#    renterid: Mapped[int] = mapped_column(primary_key = True)
-#    rentedat: 
+class Rentals(db.Model):
+    __tablename__ = "Rentals"
+    carid: Mapped[int] = mapped_column(primary_key = True)
+    renterid: Mapped[int] = mapped_column(primary_key = True)
+#    rentedat: ez majd később
+    rentstatus: Mapped[str] = mapped_column(String(20))
+    rentduration: Mapped[int]
+    rentprice: Mapped[int]
+    renteraddress: Mapped[str] = mapped_column(String(100))
+    renterphonenum: Mapped[str] = mapped_column(String(32))
+
+class Cars(db.Model):
+    __tablename__ = "Cars"
+    carid: Mapped[int] = mapped_column(primary_key = True)
+    numberplate: Mapped[str] = mapped_column(String(32))
+    rentable: Mapped[bool]
+    price: Mapped[int]
+    manufacturer: Mapped[str] = mapped_column(String(32))
+    model: Mapped[str] = mapped_column(String(32))
+    color: Mapped[str] = mapped_column(String(32))
+    seats: Mapped[int]
+    pictures: Mapped[str] = mapped_column(String(100))
+    interior: Mapped[str] = mapped_column(String(32))
+    bodytype: Mapped[str] = mapped_column(String(32))
+    gearbox: Mapped[str] = mapped_column(String(32))
+    doors: Mapped[int]
+    fueltype: Mapped[str] = mapped_column(String(32))
+    topspeed: Mapped[int]
+    power: Mapped[int]
+    torque: Mapped[int]
+    enginetype: Mapped[str] = mapped_column(String(32))
+    extras: Mapped[str] = mapped_column(String(100))
 
 # előző adatbázis nullázása teszteléshez
 db.session.query(Users).delete()
