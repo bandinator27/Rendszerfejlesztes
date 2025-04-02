@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
+{% block title %}View all users{% endblock %}
 {% block content %}
 	{% with messages = get_flashed_messages() %}
 		{% if messages %}
@@ -8,6 +8,5 @@
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-	<h1>Welcome to My Blog!</h1><br>
-	Logged in as: {{user}}<br><br>
+	<p>Admin panel</p>
 {% endblock %}

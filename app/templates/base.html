@@ -21,18 +21,30 @@
 			  <li class="nav-item">
 				<a class="nav-link active" aria-current="page" href="/cars">Autó lista</a>
 			  </li>
-			  <li class="nav-item">
-				<a class="nav-link active" aria-current="page" href="/login">Belépés</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link active" aria-current="page" href="/logout">Kilépés</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link active" aria-current="page" href="/register">Regisztráció</a>
-			  </li>
-			  <li class="nav-item">
-				<a class="nav-link active" aria-current="page" href="/view">Felhasználók</a>
-			  </li>
+			  {% if session["user"] %}
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="/logout">Kilépés</a>
+				</li>
+			  {% else %}
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="/login">Belépés</a>
+				</li>
+			  {% endif %}
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="/view">Felhasználók</a>
+				</li>
+			  {% if session["role"] == "Admin" %}
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="/admin">Admin Panel</a>
+				</li>
+			  {% endif %}
+			</ul>
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+				{% if session["user"] %}
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="/account">Account</a>
+					</li>
+		  		{% endif %}
 			</ul>
 		  </div>
 		</div>

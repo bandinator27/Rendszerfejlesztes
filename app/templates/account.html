@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}View all users{% endblock %}
+{% block content %}
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for msg in messages %}
+				<p>{{msg}}</p>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+	<p>Account panel</p>
+	<p>{{userAccount.id}} Name: {{userAccount.username}}, Password: {{userAccount.password}}, Password_Salt: {{userAccount.password_salt}}
+		Email: {{userAccount.email}}, Address: {{userAccount.address}}, Phone number: {{userAccount.phone_number}}
+	</p>
+{% endblock %}

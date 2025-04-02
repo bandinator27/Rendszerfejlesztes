@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}View all users{% endblock %}
+{% block content %}
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for msg in messages %}
+				<p>{{msg}}</p>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+	{% for item in values %}
+		<p>ID: {{item.carid}}<br>
+		   Numberplate: {{item.numberplate}}<br>
+		   Rentable: {{item.rentable}}<br>
+		   Price: {{item.price}}<br>
+		   Manufacturer: {{item.manufacturer}}<br>
+		   Model: {{item.model}}<br>
+		   Color: {{item.color}}<br>
+		   Seats: {{item.seats}}<br>
+		   Pictures: {{item.pictures}}<br>
+		   Interior: {{item.interior}}<br>
+		   BodyType: {{item.bodytype}}<br>
+		   Gearbox: {{item.gearbox}}<br>
+		   Doors: {{item.doors}}<br>
+		   Fueltype: {{item.fueltype}}<br>
+		   Topspeed: {{item.topspeed}}<br>
+		   Power: {{item.power}}<br>
+		   Torque: {{item.torque}}<br>
+		   EngineType: {{item.enginetype}}<br>
+		   Extras: {{item.extras}}<br><br>
+		</p>
+	{% endfor %}
+{% endblock %}
