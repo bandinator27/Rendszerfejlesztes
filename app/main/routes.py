@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 
 from app.database import db
-from app.main.blueprint import main_bp
+from app.blueprints import main_bp
 from app.models.cars import *
 from app.models.rentals import *
 from app.models.roles import *
@@ -45,8 +45,7 @@ def register():
             return render_template('register.html')
         else:
             dbuser = Users(username = username, password = password,
-                            password_salt = 'salty', email = 'teszt.jani@berauto.com',
-                            address = 'Veszprem, privat utca 1', phone_number = '+3670123456')
+                            password_salt = 'salty', email = 'teszt.jani@berauto.com', phone_number = '+3670123456')
             db.session.add(dbuser)
             db.session.commit()
             session.permanent = True
