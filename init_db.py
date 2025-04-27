@@ -33,6 +33,18 @@ db.session.add_all([Users(username = 'TesztBela', password = generate_password_h
 db.session.commit()
 
 # előző adatbázis nullázása teszteléshez
+db.session.query(Roles).delete()
+db.session.commit()
+#teszt adatok az adatbázishoz
+db.session.add_all([Roles(id = 1, role_name = 'User'),
+                    Roles(id = 1, role_name = 'Clerk'),
+                    Roles(id = 1, role_name = 'Administrator'),
+                    Roles(id = 2, role_name = 'User'),
+                    Roles(id = 2, role_name = 'Clerk'),
+                    Roles(id = 2, role_name = 'Administrator')])
+db.session.commit()
+
+# előző adatbázis nullázása teszteléshez
 db.session.query(Cars).delete()
 db.session.commit()
 #teszt adatok az adatbázishoz

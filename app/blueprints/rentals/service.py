@@ -1,5 +1,5 @@
 from app.database import db
-from app.blueprints.rentals.schemas import RentalsResponseSchema
+from app.blueprints.rentals.schemas import RentalsSchema
 from app.models.rentals import Rentals
 
 from sqlalchemy import select
@@ -9,8 +9,47 @@ class RentalsService:
     @staticmethod
     def view_rentals(request):
         try:
-            rental = db.session.execute(select(Rentals).filter_by(carid=1)).scalars()
+            rental = db.session.query.all(Rentals)
             
         except Exception as ex:
-            return False, "Incorrect rental data!"
-        return True, RentalsResponseSchema().dump(rental, many = True)
+            return False, "Something went wrong"
+        return True, RentalsSchema().dump(rental, many = True)
+    
+    @staticmethod
+    def rent_car(carid, request):
+        try:
+            rental = db.session.execute(select(Rentals).filter(Rentals.carid == carid,
+                                                               Rentals.rentstatus == "Rented")).scalar_one_or_none()
+            if rental:
+                return False, "This car is taken"
+            
+            rent = Rentals(
+                    request["carid"],
+                    request["renterid"],
+                    request["rentedat"],
+                    request["rentstatus"],
+                    request["rentduration"],
+                    request["rentprice"],
+                    request["renteraddress"],
+                    request["renterphonenum"]
+            )
+            db.session.add(rent)
+            db.session.commit()
+            
+        except Exception as ex:
+            return False, "Something went wrong"
+        return True, RentalsSchema().dump(rent)
+    
+    @staticmethod
+    def set_car_rentstatus(carid, request):
+        try:
+            rental = db.session.get(Rentals, carid)
+            if rental is None:
+                return False, "This rental does not exist"
+        
+            rental.rentstatus = request["rentstatus"]
+            db.session.commit()
+
+        except Exception as ex:
+            return False, "Something went wrong"
+        return True, "Success"

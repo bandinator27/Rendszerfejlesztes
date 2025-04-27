@@ -6,7 +6,7 @@ class Cars(db.Model):
     __tablename__ = "Cars"
     carid: Mapped[int] = mapped_column(primary_key = True)
     numberplate: Mapped[str] = mapped_column(String(32))
-    rentable: Mapped[bool]
+    rentable: Mapped[int]
     price: Mapped[int]
     manufacturer: Mapped[str] = mapped_column(String(32))
     model: Mapped[str] = mapped_column(String(32))
