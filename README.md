@@ -19,7 +19,4 @@ sudo docker compose up
 (Előtte minden táblának bent kell lennie a migrációs adatbázisban, különben hibát fog dobni.)
 
 TODO:
-
-- api végpontok folytatása
-- meglévő oldalak kidolgozása
-- kód rendberakása
+front-end
