@@ -60,8 +60,19 @@ class UserService:
         payload = PayloadSchema()
         payload.exp = int((datetime.now()+timedelta(minutes=30)).timestamp())
         payload.user_id = user.id
-        roles = db.session.execute(select(Roles).filter(Roles.id==user.id)).scalars()
-        payload.roles = RoleSchema().dump(roles, many=True)
+        roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "Administrator")).scalar_one_or_none()
+        if roles is None:
+            roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "Clerk")).scalar_one_or_none()
+            if roles is None:
+                roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "User")).scalar_one_or_none()
+                if roles is None:
+                    payload.roles = "None"
+                else:
+                    payload.roles = "User"
+            else:
+                payload.roles = "Clerk"
+        else:
+            payload.roles = "Administrator"
 
         return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
     
@@ -77,11 +88,11 @@ class UserService:
     
     @staticmethod
     def get_user_data(user_id):
-        user = db.session.execute(select(Users).filter(Users.id == user_id)).scalar_one_or_none()
+        user = db.session.execute(select(Users).filter(Users.email == user_id)).scalar_one_or_none()
         if user is None:
             return False, "User not found!"
         
-        return True, UserResponseSchema().dump(user, many = True)
+        return True, UserResponseSchema().dump(user)
     
     @staticmethod
     def set_user_data(user_id, request):

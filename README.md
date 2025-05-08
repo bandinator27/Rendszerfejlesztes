@@ -20,6 +20,7 @@ sudo docker compose up
 
 TODO:
 
-- api végpontok folytatása
+- api végpontok létrehozása
 - meglévő oldalak kidolgozása
+- jelszó titkosítás hashel és sózással
 - kód rendberakása

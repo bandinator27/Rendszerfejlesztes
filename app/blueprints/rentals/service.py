@@ -7,9 +7,9 @@ from sqlalchemy import select
 class RentalsService:
 
     @staticmethod
-    def view_rentals(request):
+    def view_rentals():
         try:
-            rental = db.session.query.all(Rentals)
+            rental = db.session.query(Rentals).all()
             
         except Exception as ex:
             return False, "Something went wrong"

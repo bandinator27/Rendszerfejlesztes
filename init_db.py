@@ -24,10 +24,10 @@ db.session.commit()
 db.session.query(Users).delete()
 db.session.commit()
 #teszt adatok az adatbázishoz
-db.session.add_all([Users(username = 'TesztBela', password = generate_password_hash('teszt'), password_salt = 'salty',
+db.session.add_all([Users(username = 'TesztBela', password = generate_password_hash('teszt123'), password_salt = 'salty',
                         address_id = 1, email = 'teszt.bela@berauto.com',
                         phone_number = '+3670123456'),
-                    Users(username = 'TesztJani', password = generate_password_hash('teszt'), password_salt = 'salty',
+                    Users(username = 'TesztJani', password = generate_password_hash('teszt123'), password_salt = 'salty',
                         address_id = 2, email = 'teszt.jani@berauto.com',
                         phone_number = '+3670123457')])
 db.session.commit()
@@ -60,4 +60,16 @@ db.session.add_all([Cars(numberplate = 'ERT-555', rentable = 1, price = 5000,
                          bodytype = 'Hatchback', gearbox = 'manual', doors = 4,
                          fueltype = 'Diesel', topspeed = 270, power = 105,
                          torque = 200, enginetype = '1.9l TDI', extras = 'ABS')])
+db.session.commit()
+
+# előző adatbázis nullázása teszteléshez
+db.session.query(Rentals).delete()
+db.session.commit()
+#teszt adatok az adatbázishoz
+db.session.add_all([Rentals(carid = 1, renterid = 1, rentstatus = "Rented",
+                         rentduration = 1, rentprice = 500, renteraddress = "Veszprém, privát utca 1",
+                         renterphonenum = "+36701234567"),
+                    Rentals(carid = 2, renterid = 2, rentstatus = "Returned",
+                         rentduration = 15, rentprice = 1500, renteraddress = "Veszprém, privát utca 2",
+                         renterphonenum = "+36701234568")])
 db.session.commit()

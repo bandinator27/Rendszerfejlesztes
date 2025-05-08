@@ -39,7 +39,7 @@ def user_view():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@user_bp.post('/myroles')
+@user_bp.get('/myroles')
 @user_bp.doc(tags=["user"])
 @user_bp.output(RoleSchema(many = True))
 @user_bp.auth_required(auth)
@@ -61,10 +61,10 @@ def user_list_roles():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@user_bp.get('/user_data/<int:uid>')
+@user_bp.get('/user_data/<string:uid>')
 @user_bp.doc(tags=["user"])
-@user_bp.output(UserResponseSchema(many = True))
-@user_bp.auth_required(auth)
+@user_bp.output(UserResponseSchema())
+#@user_bp.auth_required(auth)
 #@role_required(["User"])
 #@role_required(["Clerk", "Administrator"])
 def get_user_data(uid):

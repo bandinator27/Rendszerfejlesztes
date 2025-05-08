@@ -18,7 +18,7 @@ def view_rentals():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@rental_bp.post('/<int:cid>')
+@rental_bp.get('/<int:cid>')
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.input(RentalsSchema, location="json")
 @rental_bp.auth_required(auth)
