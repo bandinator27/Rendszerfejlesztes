@@ -3,7 +3,7 @@ Rendszerfejlesztés
 Virtuális környezet használata: (Windows)
 .\env\Scripts\activate
 
-export FLASK_APP=app/app.py
+(export FLASK_APP=app/app.py)
 
 ezután lehet használni a migrációs parancsokat:
 
@@ -16,9 +16,3 @@ flask run
 
 VAGY
 Visaul Studio Start Without Debugging aktív run_app.py fájlban
-
-TODO:
-- api végpontok létrehozása
-- meglévő oldalak kidolgozása
-- jelszó titkosítás hashel és sózással
-- kód rendberakása

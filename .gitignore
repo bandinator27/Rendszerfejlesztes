@@ -1,4 +1,11 @@
 ﻿/.ssh/
-/__pycache__/
+__pycache__/
+*.py[cod]
+*$py.class
 *.pyc
-env/
+.env
+.venv
+
+# Flask stuff:
+instance/
+.webassets-cache
