@@ -15,7 +15,7 @@ class UserService:
     def user_registrate(request):
         try:
             if db.session.execute(select(Users).filter_by(email=request["email"])).scalar_one_or_none():
-                return False, "E-mail already exist!"
+                return False, "E-mail already exists!"
             
             request["address"] = Addresses(**request["address"])
             user = Users(**request)

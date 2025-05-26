@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Register Page{% endblock %}
 {% block content %}
 	{% with messages = get_flashed_messages() %}
@@ -8,15 +8,28 @@
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-<form action="#" method="post">
-	<div class="form-floating mb-3">
-		<input type="text" class="form-control" name="username" placeholder="Username">
-		<label for="floatingInput">Username</label>
+
+<div class="container text-center mt-4">
+	<div class="row justify-content-center">
+		<form action="#" method="post" class="col-sm-6 col-lg-4">
+			<div class="form-floating mb-3">
+				<input type="text"
+					   class="form-control"
+					   name="username"
+					   placeholder="Felhasználónév">
+				<label for="username">Felhasználónév</label>
+			</div>
+			<div class="form-floating mb-3">
+				<input type="password"
+					   class="form-control"
+					   name="password"
+					   placeholder="Jelszó">
+				<label for="password">Jelszó</label>
+			</div>
+			<div class="d-grid gap-2 d-md-block my-2">
+				<button class="btn btn-primary" type="submit">Regisztráció</button>
+			</div>
+		</form>
 	</div>
-	<div class="form-floating">
-		<input type="password" class="form-control" name="password" placeholder="Password">
-		<label for="floatingPassword">Password</label>
-	</div><br>
-	<button type="submit" class="btn btn-primary">Register</button>
-</form>
+</div>
 {% endblock %}

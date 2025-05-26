@@ -8,9 +8,14 @@
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-	{% for item in response %}
-		<p>{{item.id}} Name: {{item["username"]}}, Password: {{item["password"]}}
-			Email: {{item["email"]}}, Address: {{item["address"]}}, Phone number: {{item["phone_number"]}}
-		</p>
+	{% for item in values %}
+	<p>
+		Id: {{item.id}},
+		Name: {{item.username}},
+		Password: {{item.password}}
+		Email: {{item.email}},
+		Address: {{item.address}},
+		Phone number: {{item.phone_number}}
+	</p>
 	{% endfor %}
 {% endblock %}

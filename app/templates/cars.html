@@ -4,36 +4,140 @@
 	{% with messages = get_flashed_messages() %}
 		{% if messages %}
 			{% for msg in messages %}
-				<p>{{msg}}</p>
+			<p>{{msg}}</p>
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-	<div class="container">
-	{% for item in values %}
-		<div class="row">
-		  <div class="col-sm-4">
-			<p>ID: {{item.carid}}<br>
-				Numberplate: {{item.numberplate}}<br>
-				Rentable: {{item.rentable}}<br>
-				Price: {{item.price}}<br>
-				Manufacturer: {{item.manufacturer}}<br>
-				Model: {{item.model}}<br>
-				Color: {{item.color}}<br>
-				Seats: {{item.seats}}<br>
-				Pictures: {{item.pictures}}<br>
-				Interior: {{item.interior}}<br>
-				BodyType: {{item.bodytype}}<br>
-				Gearbox: {{item.gearbox}}<br>
-				Doors: {{item.doors}}<br>
-				Fueltype: {{item.fueltype}}<br>
-				Topspeed: {{item.topspeed}}<br>
-				Power: {{item.power}}<br>
-				Torque: {{item.torque}}<br>
-				EngineType: {{item.enginetype}}<br>
-				Extras: {{item.extras}}<br><br>
-			 </p>
-		  </div>
-		</div>
-	{% endfor %}
+
+<div class="container">
+	<div class="table-responsive">
+		<table class="table table-striped table-bordered table-hover my-2">
+			<thead>
+				<tr>
+					<th>Attribute</th>
+					{% for item in values %}
+					<th>Car {{ loop.index }}</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>ID</th>
+					{% for item in values %}
+					<td>{{ item.carid }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Numberplate</th>
+					{% for item in values %}
+					<td>{{ item.numberplate }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Rentable</th>
+					{% for item in values %}
+					<td>{{ item.rentable }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Price</th>
+					{% for item in values %}
+					<td>{{ item.price }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Manufacturer</th>
+					{% for item in values %}
+					<td>{{ item.manufacturer }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Model</th>
+					{% for item in values %}
+					<td>{{ item.model }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Color</th>
+					{% for item in values %}
+					<td>{{ item.color }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Seats</th>
+					{% for item in values %}
+					<td>{{ item.seats }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Pictures</th>
+					{% for item in values %}
+					<td>{{ item.pictures }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Interior</th>
+					{% for item in values %}
+					<td>{{ item.interior }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>BodyType</th>
+					{% for item in values %}
+					<td>{{ item.bodytype }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Gearbox</th>
+					{% for item in values %}
+					<td>{{ item.gearbox }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Doors</th>
+					{% for item in values %}
+					<td>{{ item.doors }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Fueltype</th>
+					{% for item in values %}
+					<td>{{ item.fueltype }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Topspeed</th>
+					{% for item in values %}
+					<td>{{ item.topspeed }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Power</th>
+					{% for item in values %}
+					<td>{{ item.power }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Torque</th>
+					{% for item in values %}
+					<td>{{ item.torque }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>EngineType</th>
+					{% for item in values %}
+					<td>{{ item.enginetype }}</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					<th>Extras</th>
+					{% for item in values %}
+					<td>{{ item.extras }}</td>
+					{% endfor %}
+				</tr>
+			</tbody>
+		</table>
 	</div>
+</div>
+
 {% endblock %}

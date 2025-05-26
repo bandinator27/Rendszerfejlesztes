@@ -1,7 +1,7 @@
 Rendszerfejlesztés
 
-Virtuális környezet használata: (Linux)
-source ./.venv/bin/activate
+Virtuális környezet használata: (Windows)
+.\env\Scripts\activate
 
 export FLASK_APP=app/app.py
 
@@ -14,12 +14,10 @@ flask db migrate -m "TÁBLA_NEVE table"
 ha be van aktiválva a virtuális környezet akkor lehet indítani a webszervert:
 flask run
 
-Webszerver indítás dockerrel: (Linux)
-sudo docker compose up
-(Előtte minden táblának bent kell lennie a migrációs adatbázisban, különben hibát fog dobni.)
+VAGY
+Visaul Studio Start Without Debugging aktív run_app.py fájlban
 
 TODO:
-
 - api végpontok létrehozása
 - meglévő oldalak kidolgozása
 - jelszó titkosítás hashel és sózással

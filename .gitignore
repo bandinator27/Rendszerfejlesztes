@@ -1,0 +1,4 @@
+﻿/.ssh/
+/__pycache__/
+*.pyc
+env/

@@ -11,7 +11,7 @@ from app.database import auth
 def index():
     return 'This is the user Blueprint'
 
-@user_bp.post('/registrate')
+@user_bp.post('/register')
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.output(UserResponseSchema)
 def user_registrate(json_data):

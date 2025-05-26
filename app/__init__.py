@@ -17,7 +17,7 @@ def create_app(config_class=Config):
     migrate = Migrate(app, db, render_as_batch=True)
 
     from app.blueprints import main_bp
-    app.register_blueprint(main_bp, url_prefix='/api')
+    app.register_blueprint(main_bp, url_prefix='/')
 
     import init_db
 
