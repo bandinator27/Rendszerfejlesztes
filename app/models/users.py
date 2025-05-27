@@ -13,6 +13,8 @@ class Users(db.Model):
     email: Mapped[str] = mapped_column(String(32))
     address_id: Mapped[int] = mapped_column(ForeignKey("Addresses.id"))
     phone_number: Mapped[str] = mapped_column(String(32))
+    #role_id: Mapped[int] = mapped_column(ForeignKey('Roles.id'))
+    #role = db.relationship('Roles', backref='users', foreign_keys = [role_id])
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

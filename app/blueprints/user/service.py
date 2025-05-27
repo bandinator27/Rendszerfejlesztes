@@ -1,4 +1,4 @@
-from app.database import db
+﻿from app.database import db
 from app.blueprints.user.schemas import UserResponseSchema, PayloadSchema, RoleSchema
 from app.models.users import Users
 from app.models.addresses import Addresses
@@ -60,11 +60,11 @@ class UserService:
         payload = PayloadSchema()
         payload.exp = int((datetime.now()+timedelta(minutes=30)).timestamp())
         payload.user_id = user.id
-        roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "Administrator")).scalar_one_or_none()
+        roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "Administrator")).scalar_one_or_none()
         if roles is None:
-            roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "Clerk")).scalar_one_or_none()
+            roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "Clerk")).scalar_one_or_none()
             if roles is None:
-                roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "User")).scalar_one_or_none()
+                roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "User")).scalar_one_or_none()
                 if roles is None:
                     payload.roles = "None"
                 else:
@@ -97,7 +97,6 @@ class UserService:
     @staticmethod
     def set_user_data(user_id, request):
         try:
-
             user = db.session.get(Users, user_id)
             if user:
                 user.username = request["username"]
@@ -106,8 +105,8 @@ class UserService:
                 user.phone_number = request["phone_number"]
                 address = request["Address"]
                 addr = db.session.execute(select(Addresses).filter(Addresses.city == address.city,
-                                                                    Addresses.street == address.street,
-                                                                    Addresses.postalcode == address.postalcode)).scalar_one_or_none()
+                   Addresses.street == address.street,
+                   Addresses.postalcode == address.postalcode)).scalar_one_or_none()
                 if addr is None:
                     new_address = Addresses(address.city, address.street, address.postalcode)
                     db.session.add(new_address)
@@ -118,7 +117,7 @@ class UserService:
                 db.session.commit()
 
         except Exception as ex:
-            return False, "Something went wrong"
+            return False, "Váratlan hiba történt!"
 
     @staticmethod
     def add_user_role(user_id, role_name):
@@ -129,7 +128,7 @@ class UserService:
             return True, RoleSchema().dump(roles)
         
         except Exception as ex:
-            return False, "Database error"
+            return False, "Adatbázis hiba"
         
     @staticmethod
     def remove_user_role(user_id, role_name):
@@ -139,7 +138,7 @@ class UserService:
             return True, RoleSchema().dump(roles)
         
         except Exception as ex:
-            return False, "Database error"
+            return False, "Adatbázis hiba"
         
     @staticmethod
     def get_user_roles(user_id):

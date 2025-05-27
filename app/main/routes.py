@@ -7,6 +7,7 @@ from app.models.rentals import *
 from app.models.roles import *
 from app.models.users import *
 from werkzeug.security import check_password_hash
+from sqlalchemy import or_
 
 @main_bp.route("/")
 def home():

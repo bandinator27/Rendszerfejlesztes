@@ -1,7 +1,6 @@
-from app.database import db
+﻿from app.database import db
 from app.blueprints.cars.schemas import CarsSchema
 from app.models.cars import Cars
-
 from sqlalchemy import select
 
 class CarsService:
@@ -21,10 +20,10 @@ class CarsService:
         try:
             cars = db.session.execute(select(Cars).filter(Cars.carid == cid)).scalar_one_or_none()
             if cars is None:
-                return False, "There is no car in the database with this ID"
+                return False, "Ezzel az ID-vel nem található autó az adatbázisban"
 
         except Exception as ex:
-            return False, "Database or server error!"
+            return False, "Adatbázis vagy szerver hiba!"
         return True, CarsSchema().dump(cars)
     
     @staticmethod
@@ -54,7 +53,7 @@ class CarsService:
                 return True, "Success"
                     
         except Exception as ex:
-            return False, "Something went wrong"
+            return False, "Adatbázis vagy szerver hiba!"
         
     @staticmethod
     def add_car(request):

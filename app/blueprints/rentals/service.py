@@ -1,4 +1,4 @@
-from app.database import db
+﻿from app.database import db
 from app.blueprints.rentals.schemas import RentalsSchema
 from app.models.rentals import Rentals
 
@@ -12,16 +12,15 @@ class RentalsService:
             rental = db.session.query(Rentals).all()
             
         except Exception as ex:
-            return False, "Something went wrong"
+            return False, "Váratlan hiba történt!"
         return True, RentalsSchema().dump(rental, many = True)
     
     @staticmethod
     def rent_car(carid, request):
         try:
-            rental = db.session.execute(select(Rentals).filter(Rentals.carid == carid,
-                                                               Rentals.rentstatus == "Rented")).scalar_one_or_none()
+            rental = db.session.execute(select(Rentals).filter(Rentals.carid == carid, Rentals.rentstatus == "Rented")).scalar_one_or_none()
             if rental:
-                return False, "This car is taken"
+                return False, "Ez az autó foglalt"
             
             rent = Rentals(
                     request["carid"],
@@ -37,7 +36,7 @@ class RentalsService:
             db.session.commit()
             
         except Exception as ex:
-            return False, "Something went wrong"
+            return False, "Váratlan hiba történt!"
         return True, RentalsSchema().dump(rent)
     
     @staticmethod
@@ -45,11 +44,11 @@ class RentalsService:
         try:
             rental = db.session.get(Rentals, carid)
             if rental is None:
-                return False, "This rental does not exist"
+                return False, "Ez a foglalás nem létezik"
         
             rental.rentstatus = request["rentstatus"]
             db.session.commit()
 
         except Exception as ex:
-            return False, "Something went wrong"
-        return True, "Success"
+            return False, "Váratlan hiba történt!"
+        return True, "Siker"
