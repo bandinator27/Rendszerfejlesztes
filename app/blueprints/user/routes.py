@@ -14,8 +14,8 @@ def index():
 @user_bp.post('/register')
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.output(UserResponseSchema)
-def user_registrate(json_data):
-    success, response = UserService.user_registrate(json_data)
+def user_register(json_data):
+    success, response = UserService.user_register(json_data)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
@@ -55,7 +55,7 @@ def user_list_roles():
 @user_bp.output(RoleSchema(many = True))
 #@role_required(["User"])
 #@role_required(["Clerk", "Administrator"])
-def user_list_roles():
+def user_list_all_roles():
     success, response = UserService.list_roles(1)
     if success:
         return response, 200
@@ -83,7 +83,7 @@ def set_user_data(uid, json_data):
     success, response = UserService.set_user_data(uid, json_data)
     if success:
         return response, 200
-    raise HTTPError(message=response, status_code=400)
+    raise HTTPError(message = response, status_code = 400)
 
 @user_bp.post('/add_role/<int:uid>')
 @user_bp.doc(tags=["user"])
@@ -95,7 +95,7 @@ def add_user_role(uid, json_data):
     success, response = UserService.add_user_role(uid, json_data)
     if success:
         return response, 200
-    raise HTTPError(message=response, status_code=400)
+    raise HTTPError(message = response, status_code = 400)
         
 @user_bp.post('/remove_role/<int:uid>')
 @user_bp.doc(tags=["user"])

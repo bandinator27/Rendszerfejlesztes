@@ -1,19 +1,25 @@
 ﻿{% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
-{% block content %}
-	{% with messages = get_flashed_messages() %}
-		{% if messages %}
-			{% for msg in messages %}
-			<div class="alert alert-success d-flex alert-dismissible fade show col-sm-8 col-lg-4 mt-4" role="alert">
-				<i class="bi bi-check-circle pe-2"></i>
-				<div>
-					{{ msg }}
-					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-				</div>
-			</div>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
-	<h1>Kezdőlap</h1>
-    <p>Bejelentkezve mint: {{user}}</p>
-{% endblock %}
+{% block title %} Kezdőlap {% endblock %}
+    {% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-success d-flex alert-dismissible fade show col-sm-8 col-lg-4 mt-4" role="alert">
+        <i class="bi bi-check-circle pe-2"></i>
+        <div>
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <h1 class="pt-2">Kezdőlap</h1>
+    {% if user == "None" %}
+    <p>Nem vagy bejelentkezve.</p>
+    {% else %}
+    <p>Bejelentkezve mint: {{ user }}</p>
+    {% endif %}
+</div>
+    {% endblock %}

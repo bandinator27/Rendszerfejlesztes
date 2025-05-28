@@ -1,5 +1,5 @@
-﻿/.ssh/
-__pycache__/
+﻿__pycache__/
+.vs/
 *.py[cod]
 *$py.class
 *.pyc

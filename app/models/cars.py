@@ -12,7 +12,7 @@ class Cars(db.Model):
     model: Mapped[str] = mapped_column(String(32))
     color: Mapped[str] = mapped_column(String(32))
     seats: Mapped[int]
-    pictures: Mapped[str] = mapped_column(String(100))
+    # pictures: Mapped[str] = mapped_column(String(100))
     interior: Mapped[str] = mapped_column(String(32))
     bodytype: Mapped[str] = mapped_column(String(32))
     gearbox: Mapped[str] = mapped_column(String(32))

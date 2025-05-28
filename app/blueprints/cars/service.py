@@ -8,11 +8,11 @@ class CarsService:
     @staticmethod
     def view_cars():
         try:
-            cars = db.session.execute(select(Cars).filter(Cars.rentable == 1)).scalars()
-            #cars = db.session.query(Cars).all()
+            #cars = db.session.execute(select(Cars).filter(Cars.rentable == 1)).scalars()
+            cars = db.session.query(Cars).all()
 
         except Exception as ex:
-            return False, "Database or server error!"
+            return False, f"Adatbázis vagy szerver hiba! ({ex})"
         return True, CarsSchema().dump(cars, many = True)
     
     @staticmethod
@@ -38,7 +38,7 @@ class CarsService:
                 car.model = request["model"]
                 car.color = request["color"]
                 car.seats = request["seats"]
-                car.pictures = request["pictures"]
+                # car.pictures = request["pictures"]
                 car.interior = request["interior"]
                 car.bodytype = request["bodytype"]
                 car.gearbox = request["gearbox"]
@@ -53,7 +53,7 @@ class CarsService:
                 return True, "Success"
                     
         except Exception as ex:
-            return False, "Adatbázis vagy szerver hiba!"
+            return False, f"Adatbázis vagy szerver hiba! ({ex})"
         
     @staticmethod
     def add_car(request):
@@ -61,7 +61,7 @@ class CarsService:
         car = Cars(**request)
         db.session.add(car)
         db.session.commit()
-        return True, "Success"
+        return True, "Siker!"
                     
         #except Exception as ex:
         #    return False, "Something went wrong"

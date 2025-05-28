@@ -1,6 +1,7 @@
 ﻿{% extends "base.html" %}
-{% block title %}View all users{% endblock %}
+{% block title %} Összes autó {% endblock %}
 {% block content %}
+<div class="container">
 	{% with messages = get_flashed_messages() %}
 		{% if messages %}
 			{% for msg in messages %}
@@ -9,14 +10,12 @@
 		{% endif %}
 	{% endwith %}
 
-
-<div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-4 my-4">
-            <form action="/car/" method="get" onsubmit="window.open('/car/' + this.cid.value, '_blank'); return false;">
+            <form action="{{ url_for('main.cars') }}" method="get">
                 <div class="input-group">
                     <input type="number" name="cid" class="form-control" placeholder="Autó ID" required>
-                    <button class="btn btn-outline-light" type="submit">Mutat (JSON)</button>
+                    <button class="btn btn-outline-light" type="submit">Szűrés</button>
                 </div>
             </form>
         </div>
@@ -25,23 +24,17 @@
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover mb-4">
+    <div class="table-responsive row justify-content-center">
+        <table class="table table-striped table-bordered table-hover mb-4 w-auto">
             <thead>
                 <tr>
-                    <th>Attribute</th>
+                    <th>ID</th>
                     {% for item in values %}
-                    <th>Car {{ loop.index }}</th>
+                    <th>{{ item.carid }}</th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th>ID</th>
-                    {% for item in values %}
-                    <td>{{ item.carid }}</td>
-                    {% endfor %}
-                </tr>
                 <tr>
                     <th>Numberplate</th>
                     {% for item in values %}
@@ -82,12 +75,6 @@
                     <th>Seats</th>
                     {% for item in values %}
                     <td>{{ item.seats }}</td>
-                    {% endfor %}
-                </tr>
-                <tr>
-                    <th>Pictures</th>
-                    {% for item in values %}
-                    <td>{{ item.pictures }}</td>
                     {% endfor %}
                 </tr>
                 <tr>

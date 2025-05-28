@@ -9,7 +9,8 @@ class Rentals(db.Model):
     __tablename__ = "Rentals"
     carid: Mapped[int] = mapped_column(ForeignKey("Cars.carid"), primary_key = True)
     renterid: Mapped[int] = mapped_column(ForeignKey("Users.id"), primary_key = True)
-    rentedat: Mapped[datetime] = mapped_column(server_default=now())
+    # rentedat: Mapped[datetime] = mapped_column(server_default=now())
+    rentedat: Mapped[str] = mapped_column(String(10))
     rentstatus: Mapped[str] = mapped_column(String(20))
     rentduration: Mapped[int]
     rentprice: Mapped[int]

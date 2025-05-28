@@ -1,17 +1,19 @@
-Rendszerfejlesztés
+# Rendszerfejlesztés
+## Bérautó
 
-Virtuális környezet használata (Windows):  
-.\env\Scripts\activate
+Virtuális környezet indítás projektkönyvtárban:  
+```
+python -m venv env  
+(Windows) .\env\Scripts\activate
+(Linux) source env/bin/activate
+```
 
-(export FLASK_APP=app/app.py)
-
-ezután lehet használni a migrációs parancsokat:  
-flask db init (erre csak akkor van szükség ha nincs migrációs mappa)  
+Ezután lehet használni a migrációs parancsokat:  
+```
+flask db init (erre csak akkor van szükség ha nincs migration mappa)  
 flask db upgrade  
 flask db migrate -m "TÁBLA_NEVE table"
+```
 
-ha be van aktiválva a virtuális környezet akkor lehet indítani a webszervert:  
-flask run
-
-VAGY  
-Visaul Studio Start Without Debugging aktív run_app.py fájlban
+Ha aktív a virtuális környezet akkor lehet indítani a webszervert:  
+`flask run` *vagy* `python run_app.py` *vagy* Visaul Studio-ban Start Without Debugging aktív run_app.py fájlban

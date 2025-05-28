@@ -9,13 +9,12 @@
 		{% endif %}
 	{% endwith %}
 	{% for item in values %}
-	<p>
-		Id: {{item.id}},
-		Name: {{item.username}},
-		Password: {{item.password}}
-		Email: {{item.email}},
-		Address: {{item.address}},
-		Phone number: {{item.phone_number}}
-	</p>
+    <p>
+        Id: {{item.id}},
+        Name: {{item.username}},
+        Email: {{item.email}},
+        Address: {{item.address.city}}, {{item.address.street}}, {{item.address.postalcode}},
+        Phone number: {{item.phone_number}}
+    </p>
 	{% endfor %}
 {% endblock %}

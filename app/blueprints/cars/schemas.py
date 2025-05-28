@@ -10,7 +10,7 @@ class CarsSchema(Schema):
     model = fields.String()
     color = fields.String()
     seats = fields.Integer()
-    pictures = fields.String()
+    # pictures = fields.String()
     interior = fields.String()
     bodytype = fields.String()
     gearbox = fields.String()

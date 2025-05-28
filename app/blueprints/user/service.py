@@ -6,26 +6,36 @@ from app.models.roles import Roles
 from datetime import datetime, timedelta
 from authlib.jose import jwt
 from flask import current_app
-
 from sqlalchemy import select
+from werkzeug.security import generate_password_hash
 
 class UserService:
 
     @staticmethod
-    def user_registrate(request):
+    def user_register(request):
         try:
             if db.session.execute(select(Users).filter_by(email=request["email"])).scalar_one_or_none():
-                return False, "E-mail already exists!"
+                return False, "A megadott e-mail cím már létezik!"
             
-            request["address"] = Addresses(**request["address"])
+            address_data = request.pop("address")
+            address = Addresses(**address_data)
+            db.session.add(address)
+            db.session.commit()
+
+            request["address_id"] = address.id
+            request["password"] = generate_password_hash(request["password"])
+
             user = Users(**request)
             db.session.add(user)
             db.session.commit()
             UserService.add_user_role(user.id, "User")
 
         except Exception as ex:
-            return False, "Incorrect User data!"
-        return True, UserResponseSchema().dump(user)
+            return False, f"Hibás felhasználói adatok! ({ex})"
+        return True, {
+            "message": "Sikeres regisztráció!",
+            "user": UserResponseSchema().dump(user)
+        }
     
     @staticmethod
     def user_login(request):
@@ -37,13 +47,13 @@ class UserService:
             #        return False, "Incorrect e-mail/username or password!"
                 
         if not user.check_password(request["password"]):
-            return False, "Incorrect e-mail/username or password!"
+            return False, "Helytelen felhasználónév vagy jelszó!"
             
         user_schema = UserResponseSchema().dump(user)
         user_schema["token"] = UserService.token_generate(user)
         return True, UserResponseSchema().dump(user_schema)   
         #except Exception as ex:
-        #    return False, "Incorrect Login data!"
+        #    return False, "Incorrect login data!"
     
     @staticmethod
     def user_view():
@@ -52,7 +62,7 @@ class UserService:
             user = db.session.query(Users).all()
             
         except Exception as ex:
-            return False, "Incorrect Login data!"
+            return False, f"Hibás bejelentkezési adatok! ({ex})"
         return True, UserResponseSchema().dump(user, many = True)
     
     @staticmethod
@@ -66,15 +76,15 @@ class UserService:
             if roles is None:
                 roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "User")).scalar_one_or_none()
                 if roles is None:
-                    payload.roles = "None"
+                    payload.roles = ["None"]
                 else:
-                    payload.roles = "User"
+                    payload.roles = ["User"]
             else:
-                payload.roles = "Clerk"
+                payload.roles = ["Clerk"]
         else:
-            payload.roles = "Administrator"
+            payload.roles = ["Administrator"]
 
-        return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
+        return jwt.encode({'alg': 'HS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
     
     @staticmethod
     def list_roles(user_id):
@@ -91,7 +101,6 @@ class UserService:
         user = db.session.execute(select(Users).filter(Users.email == user_id)).scalar_one_or_none()
         if user is None:
             return False, "User not found!"
-        
         return True, UserResponseSchema().dump(user)
     
     @staticmethod
@@ -117,7 +126,7 @@ class UserService:
                 db.session.commit()
 
         except Exception as ex:
-            return False, "Váratlan hiba történt!"
+            return False, f"Váratlan hiba történt! ({ex})"
 
     @staticmethod
     def add_user_role(user_id, role_name):
@@ -145,6 +154,6 @@ class UserService:
         roles = db.session.execute(select(Roles).filter(Roles.id==user_id)).scalars()
 
         if roles is None:
-            return False, "User or Roles not found!"
+            return False, "A felhasználó vagy a szerepkör nem található!"
         
         return True, RoleSchema().dump(roles, many = True)
