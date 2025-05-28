@@ -1,4 +1,4 @@
-from app.blueprints.cars import car_bp
+﻿from app.blueprints.cars import car_bp
 from app.blueprints.cars.schemas import CarsSchema
 from apiflask import HTTPError
 from app.blueprints.cars.service import CarsService
@@ -7,7 +7,7 @@ from app.blueprints import role_required
 
 @car_bp.route('/')
 def index():
-    return 'Ez az aut�k Blueprint'
+    return 'Ez az autók Blueprint'
 
 @car_bp.get('/view_cars')
 @car_bp.doc(tags=["car"])

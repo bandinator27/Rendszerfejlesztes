@@ -1,4 +1,4 @@
-from app.blueprints.user import user_bp
+﻿from app.blueprints.user import user_bp
 from app.blueprints.user.schemas import UserRequestSchema, UserResponseSchema
 from app.blueprints.user.schemas import UserLoginSchema
 from app.blueprints.user.schemas import RoleSchema
@@ -39,17 +39,6 @@ def user_view():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@user_bp.get('/myroles')
-@user_bp.doc(tags=["user"])
-@user_bp.output(RoleSchema(many = True))
-@user_bp.auth_required(auth)
-@role_required(["User"])
-def user_list_roles():
-    success, response = UserService.list_roles(auth.current_user.get("user_id"))
-    if success:
-        return response, 200
-    raise HTTPError(message=response, status_code=400)
-
 @user_bp.post('/roles')
 @user_bp.doc(tags=["user"])
 @user_bp.output(RoleSchema(many = True))
@@ -61,10 +50,21 @@ def user_list_all_roles():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+@user_bp.get('/myroles')
+@user_bp.doc(tags=["user"])
+@user_bp.output(RoleSchema(many = True))
+@user_bp.auth_required(auth)
+@role_required(["User"])
+def user_list_roles():
+    success, response = UserService.list_roles(auth.current_user.get("user_id"))
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
 @user_bp.get('/user_data/<string:uid>')
 @user_bp.doc(tags=["user"])
 @user_bp.output(UserResponseSchema())
-#@user_bp.auth_required(auth)
+@user_bp.auth_required(auth)
 #@role_required(["User"])
 #@role_required(["Clerk", "Administrator"])
 def get_user_data(uid):
@@ -92,7 +92,10 @@ def set_user_data(uid, json_data):
 #@role_required(["User"])
 #@role_required(["Clerk", "Administrator"])
 def add_user_role(uid, json_data):
-    success, response = UserService.add_user_role(uid, json_data)
+    role_name = json_data.get('role_name')
+    if not role_name: # egyszerűsített ellenőrzés, szerepkör neve benne van-e a JSON-ban
+        raise HTTPError(message="A szerepkör neve hiányzik!", status_code=400)
+    success, response = UserService.add_user_role(user_id=uid, role_name=role_name)
     if success:
         return response, 200
     raise HTTPError(message = response, status_code = 400)

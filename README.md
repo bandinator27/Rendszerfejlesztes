@@ -17,4 +17,4 @@ flask db migrate -m "TÁBLA_NEVE table"
 ```
 
 Ha aktív a virtuális környezet akkor lehet indítani a webszervert:  
-`flask run` *vagy* `python run_app.py` *vagy* Visaul Studio-ban Start Without Debugging aktív `run_app.py` fájlban
+`flask run` vagy `python run_app.py`

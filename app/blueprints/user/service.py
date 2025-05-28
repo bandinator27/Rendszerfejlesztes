@@ -62,7 +62,7 @@ class UserService:
             user = db.session.query(Users).all()
             
         except Exception as ex:
-            return False, f"Hibás bejelentkezési adatok! ({ex})"
+            return False, f"Hibás adatok! (user_view) Részletek: {ex}"
         return True, UserResponseSchema().dump(user, many = True)
     
     @staticmethod
@@ -126,18 +126,18 @@ class UserService:
                 db.session.commit()
 
         except Exception as ex:
-            return False, f"Váratlan hiba történt! ({ex})"
+            return False, f"Váratlan hiba történt! (set_user_data) Részletek: {ex}"
 
     @staticmethod
     def add_user_role(user_id, role_name):
         try:
-            roles = Roles(user_id, role_name)
+            roles = Roles(id=user_id, role_name=role_name)
             db.session.add(roles)
             db.session.commit()
             return True, RoleSchema().dump(roles)
-        
         except Exception as ex:
-            return False, "Adatbázis hiba"
+            db.session.rollback()  # Rollback hiba esetén
+            return False, f"Adatbázis hiba! (add_user_role) Részletek: {ex}"
         
     @staticmethod
     def remove_user_role(user_id, role_name):
@@ -145,15 +145,12 @@ class UserService:
             roles = db.session.execute(select(Roles).filter(Roles.id == user_id, Roles.role_name == role_name)).scalar_one()
             db.session.commit()
             return True, RoleSchema().dump(roles)
-        
         except Exception as ex:
-            return False, "Adatbázis hiba"
+            return False, f"Adatbázis hiba! (remove_user_role) Részletek: {ex}"
         
     @staticmethod
     def get_user_roles(user_id):
         roles = db.session.execute(select(Roles).filter(Roles.id==user_id)).scalars()
-
         if roles is None:
             return False, "A felhasználó vagy a szerepkör nem található!"
-        
         return True, RoleSchema().dump(roles, many = True)
