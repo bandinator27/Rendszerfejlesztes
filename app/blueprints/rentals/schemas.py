@@ -1,12 +1,25 @@
-from marshmallow import Schema, fields
-from apiflask.fields import String, Email, Nested, Integer, List
+from marshmallow import Schema, EXCLUDE
+from apiflask.fields import String, Integer, Date
+from datetime import datetime
 
 class RentalsSchema(Schema):
-    carid = fields.Integer()
-    renterid = fields.Integer()
-    rentedat = fields.String()
-    rentstatus = fields.String()
-    rentduration = fields.Integer()
-    rentprice = fields.Integer()
-    renteraddress = fields.String()
-    renterphonenum = fields.String()
+    carid = Integer()
+    renterid = Integer()
+    rentstart = String()
+    rentstatus = String()
+    rentduration = Integer()
+    rentprice = Integer()
+    renteraddress = String()
+    renterphonenum = String()
+
+class RentalRequestSchema(Schema):
+    rentstart = String(required=True)
+    rentduration = Integer(required=True)
+    rentprice = Integer(required=True)
+
+    class Meta:
+        unknown = EXCLUDE
+
+    @staticmethod
+    def parse_date(date_str):
+        return datetime.strptime(date_str, '%Y-%m-%d')

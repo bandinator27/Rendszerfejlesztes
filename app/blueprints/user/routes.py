@@ -2,27 +2,25 @@
 from app.blueprints.user.schemas import UserRequestSchema, UserResponseSchema
 from app.blueprints.user.schemas import UserLoginSchema
 from app.blueprints.user.schemas import RoleSchema
-from app.blueprints import role_required
 from apiflask import HTTPError
 from app.blueprints.user.service import UserService
 from app.database import auth
 
 # @user_bp.route('/')
 # def index():
-#     return 'Ez a felhasználók Blueprint'
+#     return 'This is the users Blueprint'
 
-# --- LOGIN ---
+# --- LOGIN
 @user_bp.post('/login')
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserLoginSchema, location="json")
-@user_bp.output(UserResponseSchema)
 def user_login(json_data):
     success, response = UserService.user_login(json_data)
     if success:
         return response, 200
-    raise HTTPError(message=response, status_code=400)
+    return response, 401
 
-# --- REGISTER ---
+# --- REGISTER
 @user_bp.post('/register')
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.output(UserResponseSchema)
@@ -32,7 +30,7 @@ def user_register(json_data):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-# --- MYROLES ---
+# --- MYROLES
 @user_bp.get('/myroles')
 @user_bp.doc(tags=["user"])
 @user_bp.output(RoleSchema(many=True))
@@ -44,7 +42,7 @@ def user_list_roles():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-# --ADD_ROLE ---
+# --ADD_ROLE - not in netpincer example
 # @user_bp.post('/add_role/<int:uid>')
 # @user_bp.doc(tags=["user"])
 # @user_bp.input(RoleSchema, location="json")
@@ -76,7 +74,8 @@ def user_view():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@user_bp.post('/roles') # összes role listázása
+# összes role listázása
+@user_bp.post('/roles')
 @user_bp.doc(tags=["user"])
 @user_bp.output(RoleSchema(many = True))
 #@role_required(["User"])

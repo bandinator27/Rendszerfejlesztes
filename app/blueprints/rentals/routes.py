@@ -1,13 +1,15 @@
 ﻿from app.blueprints.rentals import rental_bp
-from app.blueprints.rentals.schemas import RentalsSchema
+from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
 from apiflask import HTTPError
 from app.blueprints.rentals.service import RentalsService
 from app.database import auth
 from app.blueprints import role_required
+from app.models.users import Users
+from app.database import db
 
 # @rental_bp.route('/')
 # def index():
-#     return 'Ez a foglalások Blueprint'
+#     return 'This is the rentals Blueprint'
 
 @rental_bp.get('/view_rentals')
 @rental_bp.doc(tags=["rentals"])
@@ -18,17 +20,35 @@ def view_rentals():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-# foglalás
-@rental_bp.post('/<int:cid>')
+# --- Renting
+@rental_bp.post('/rent/<int:cid>')
 @rental_bp.doc(tags=["rentals"])
-@rental_bp.input(RentalsSchema, location="json")
+@rental_bp.input(RentalRequestSchema, location="json")
 @rental_bp.auth_required(auth)
-@role_required(["User"])
 def rent_car(cid, json_data):
-    success, response = RentalsService.rent_car(cid, json_data)
-    if success:
-        return response, 200
-    raise HTTPError(message=response, status_code=400)
+    try:
+        # Get user ID from the JWT token, other details from the database
+        user_id = auth.current_user.get("user_id")
+        user = db.session.get(Users, user_id)
+        if not user:
+            raise HTTPError(message="User not found", status_code=404)
+
+        rental_data = {
+            "carid": cid,
+            "renterid": user_id,
+            "rentstart": json_data["rentstart"],
+            "rentduration": json_data["rentduration"],
+            "rentprice": json_data["rentprice"],
+            "renteraddress": f"{user.address.postalcode} {user.address.city}, {user.address.street}",
+            "renterphonenum": user.phone_number,
+            "rentstatus": "Pending"
+        }
+        success, response = RentalsService.rent_car(cid, rental_data)
+        if success:
+            return response, 200
+        return {"message": response}, 400
+    except Exception as e:
+        return {"message": f"Error: {str(e)}"}, 400
 
 @rental_bp.post('/rentstatus/<int:cid>')
 @rental_bp.doc(tags=["rentals"])

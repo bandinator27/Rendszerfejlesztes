@@ -8,11 +8,9 @@ class CarsService:
     @staticmethod
     def view_cars():
         try:
-            #cars = db.session.execute(select(Cars).filter(Cars.rentable == 1)).scalars()
             cars = db.session.query(Cars).all()
-
         except Exception as ex:
-            return False, f"Adatbázis vagy szerver hiba! ({ex})"
+            return False, f"Database or server error! Details: {ex}"
         return True, CarsSchema().dump(cars, many = True)
     
     @staticmethod
@@ -20,10 +18,9 @@ class CarsService:
         try:
             cars = db.session.execute(select(Cars).filter(Cars.carid == cid)).scalar_one_or_none()
             if cars is None:
-                return False, "Ezzel az ID-vel nem található autó az adatbázisban"
-
+                return False, "No car found with this ID"
         except Exception as ex:
-            return False, "Adatbázis vagy szerver hiba!"
+            return False, f"Database or server error! Details: {ex}"
         return True, CarsSchema().dump(cars)
     
     @staticmethod
@@ -38,7 +35,6 @@ class CarsService:
                 car.model = request["model"]
                 car.color = request["color"]
                 car.seats = request["seats"]
-                # car.pictures = request["pictures"]
                 car.interior = request["interior"]
                 car.bodytype = request["bodytype"]
                 car.gearbox = request["gearbox"]
@@ -53,7 +49,7 @@ class CarsService:
                 return True, "Success"
                     
         except Exception as ex:
-            return False, f"Adatbázis vagy szerver hiba! ({ex})"
+            return False, f"Database or server error! Details: {ex}"
         
     @staticmethod
     def add_car(request):
@@ -61,7 +57,7 @@ class CarsService:
         car = Cars(**request)
         db.session.add(car)
         db.session.commit()
-        return True, "Siker!"
+        return True, "Success!"
                     
         #except Exception as ex:
         #    return False, "Something went wrong"

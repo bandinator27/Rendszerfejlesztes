@@ -27,12 +27,12 @@ def role_required(roles):
         def decorated_function(*args, **kwargs):
             user = getattr(auth, "current_user", None)
             if not user or not user.get("roles"):
-                raise HTTPError(message="Hozzáférés megtagadva", status_code=403)
-            #user_roles = [item.get("role_name") for item in user.get("roles", [])]
-            user_roles = user.get("roles", []) # G
+                raise HTTPError(message="Access denied", status_code=403)
+            user_roles = [item.get("role_name") for item in user.get("roles", [])]
+            
             if any(role in user_roles for role in roles):
                 return fn(*args, **kwargs)
-            raise HTTPError(message="Hozzáférés megtagadva", status_code=403)
+            raise HTTPError(message="Access denied", status_code=403)
         return decorated_function
     return wrapper
 

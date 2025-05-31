@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-from apiflask.fields import String, Email, Nested, Integer, List
+from apiflask.fields import String, Email
 from apiflask.validators import Email
 
 class AddressSchema(Schema):
@@ -26,10 +26,10 @@ class UserResponseSchema(Schema):
     token = fields.String()
 
 class UserLoginSchema(Schema):
-    email = String(validate=Email())
-    password = fields.String()
+    email = String(required=True, validate=Email())
+    password = fields.String(required=True)
 
 class PayloadSchema(Schema):
     user_id = fields.Integer()
-    roles  = fields.List(fields.Nested(RoleSchema))
+    roles = fields.List(fields.Nested(RoleSchema))
     exp = fields.Integer()

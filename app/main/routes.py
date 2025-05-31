@@ -1,5 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, session, flash
-
+from flask import redirect, url_for, render_template, request, session, flash
 from app.database import db
 from app.models.addresses import Addresses
 from app.blueprints import main_bp, user_bp
@@ -29,7 +28,7 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user'] = user.username
 
-            # ha a felhasználónak több szerepköre is van, akkor a legmagasabb szintűt fogjuk használni
+            # if the user has multiple roles, determine the primary role based on the hierarchy
             all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
             role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
             
@@ -41,15 +40,14 @@ def login():
                     primary_role = role_in_hierarchy
                     break
             session['role'] = primary_role
-            # print(f"DEBUG: session['role'] is now set to: {session['role']}")
-            flash("Bejelentkeztél!", "info")
+            flash("You're signed in!", "info")
             return redirect(url_for('main.home'))
         else:
-            flash("Hibás bejelentkezési adatok!", "danger")
+            flash("Incorrect sign-in details!", "danger")
             return render_template('login.html', register=url_for('main.register'))
     return render_template('login.html', register = url_for('main.register'))
 
-# regisztráció
+# Registration
 @main_bp.route("/register/", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -79,7 +77,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash("Sikeres regisztráció! Most már bejelentkezhetsz.", "success")
+        flash("Successful registration! You can now sign in.", "success")
         return redirect(url_for('main.login'))
 
     return render_template('register.html')
@@ -105,7 +103,7 @@ def logout():
    if "user" in session:
        session.pop("user", None)
        session.pop("role", None)
-       flash("Kijelentkeztél!", "info")
+       flash("You're signed out!", "info")
    return redirect(url_for("main.home"))
 
 @main_bp.route("/admin/")

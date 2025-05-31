@@ -5,9 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey, Table, Column
 from typing import List
 
-UserRole = Table(
-    "userroles",
-    Base.metadata,
+UserRole = Table("userroles",Base.metadata,
     Column("user_id", ForeignKey("Users.id")),
     Column("role_id", ForeignKey("Roles.id"))
 )
