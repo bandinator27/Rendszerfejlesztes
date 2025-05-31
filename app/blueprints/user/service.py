@@ -59,7 +59,7 @@ class UserService:
 
         except Exception as ex:
             return False, {
-                "message": f"Login error: {str(ex)}",
+                "message": f"Login error: {ex}",
                 "error_type": "server_error"
             }
     
@@ -67,7 +67,6 @@ class UserService:
     def user_view():
         try:
             user = db.session.query(Users).all()
-            
         except Exception as ex:
             return False, f"Data error! (user_view) Details: {ex}"
         return True, UserResponseSchema().dump(user, many=True)
@@ -77,20 +76,13 @@ class UserService:
         payload = PayloadSchema()
         payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
         payload.user_id = user.id
-        roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "Administrator")).scalar_one_or_none()
-        if roles is None:
-            roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "Clerk")).scalar_one_or_none()
-            if roles is None:
-                roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "User")).scalar_one_or_none()
-                if roles is None:
-                    payload.roles = "None"
-                else:
-                    payload.roles = "User"
-            else:
-                payload.roles = "Clerk"
+        
+        # Get all roles for current user as a list of strings
+        roles = db.session.execute(select(Roles.role_name).filter(Roles.id == user.id)).scalars().all()
+        if not roles:
+            payload.roles = ["None"]
         else:
-            payload.roles = "Administrator"
-
+            payload.roles = list(roles)
         return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload),
                           current_app.config['SECRET_KEY']).decode()
 

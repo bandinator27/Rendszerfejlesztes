@@ -61,11 +61,12 @@ def set_car_rentstatus(cid, json_data):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@rental_bp.post('/approve/<int:carid>')
+@rental_bp.post('/approve/<int:carid>/<int:renterid>')
+@rental_bp.doc(tags=["rentals"])
 @rental_bp.auth_required(auth)
-@role_required(["Administrator"])
-def approve_rental(carid, json_data):
-    renterid = json_data.get("renterid")
+@role_required(["Clerk", "Administrator"])
+def approve_rental(carid, renterid):
+    # renterid = json_data.get("renterid")
     success, response = RentalsService.approve_rental(carid, renterid)
     if success:
         return response, 200

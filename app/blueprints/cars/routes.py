@@ -43,7 +43,7 @@ def set_car_data(cid, json_data):
 @car_bp.doc(tags=["car"])
 @car_bp.input(CarsSchema, location="json")
 @car_bp.auth_required(auth)
-#@role_required(["User"])
+@role_required(["Administrator"])
 def add_car(json_data):
     success, response = CarsService.add_car(json_data)
     if success:

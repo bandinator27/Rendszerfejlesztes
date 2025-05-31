@@ -31,15 +31,20 @@ class RentalsService:
                 request["rentstart"] = datetime.strptime(request["rentstart"], "%Y-%m-%d")
             except ValueError:
                 return False, "Invalid date format. Use YYYY-MM-DD (Optional: HH:MM:SS)"
-            # Check if car is already rented or pending
-            existing_rentals = db.session.execute(
+
+            # Check if current user already has a rental for this car
+            existing_rental = db.session.get(Rentals, (carid, request["renterid"]))
+            if existing_rental:
+                return False, f"You already have a rental for Car #{carid}."
+
+            # Check if car is already rented/pending
+            active_rental = db.session.execute(
                 select(Rentals).filter(
                     Rentals.carid == carid,
                     Rentals.rentstatus.in_(["Rented", "Pending"]),
-                )
-            ).all()
+                )).scalar_one_or_none()
 
-            if existing_rentals:
+            if active_rental:
                 return False, f"Car #{carid} is currently unavailable."
 
             # Otherwise create new rental
@@ -51,9 +56,28 @@ class RentalsService:
 
         except Exception as ex:
             db.session.rollback() # Rollback in case of error
-            print(f"Error in rent_car service: {str(ex)}")
-            return False, f"Database error: {str(ex)}"
+            return False, f"Database error (rent_car service). Details: {str(ex)}"
 
+    @staticmethod
+    def approve_rental(carid, renterid):
+        try:
+            rental = db.session.execute(
+                select(Rentals).filter_by(
+                    carid=carid,
+                    renterid=renterid,
+                    rentstatus="Pending"
+                )).scalar_one_or_none()
+            if not rental:
+                return False, "No pending rental found."
+
+            rental.rentstatus = "Rented"
+            db.session.add(rental)
+            db.session.commit()
+            return True, RentalsSchema().dump(rental) # Return updated rental data
+        except Exception as ex:
+            db.session.rollback()
+            return False, f"Error while approving rental. Details: {ex}"
+    
     @staticmethod
     def set_car_rentstatus(carid, request):
         try:

@@ -82,17 +82,17 @@ db.session.add_all([
             rentduration=1,
             rentprice=500,
             renteraddress="Veszprém, Privát utca 1",
-            renterphonenum="+36201234567",
+            renterphonenum="+36201234567"
         ),
         Rentals(
             carid=2,
-            renterid=2,
+            renterid=None,
             rentstart=datetime.strptime("2025-05-18", "%Y-%m-%d"),
             rentstatus="Available",
             rentduration=15,
             rentprice=1500,
             renteraddress="Veszprém, Privát utca 2",
-            renterphonenum="+36701234568",
+            renterphonenum="+36701234568"
         )])
 
 db.session.commit()

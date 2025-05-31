@@ -1,5 +1,5 @@
 from marshmallow import Schema, EXCLUDE
-from apiflask.fields import String, Integer, Date
+from apiflask.fields import String, Integer
 from datetime import datetime
 
 class RentalsSchema(Schema):

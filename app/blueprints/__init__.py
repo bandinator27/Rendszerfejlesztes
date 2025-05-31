@@ -5,6 +5,7 @@ from authlib.jose import jwt
 from datetime import datetime
 from apiflask import HTTPError
 from functools import wraps
+from app.models import *
 
 main_bp = APIBlueprint('main', __name__, tag="main")
 
@@ -26,9 +27,10 @@ def role_required(roles):
         @wraps(fn)
         def decorated_function(*args, **kwargs):
             user = getattr(auth, "current_user", None)
+            
             if not user or not user.get("roles"):
                 raise HTTPError(message="Access denied", status_code=403)
-            user_roles = [item.get("role_name") for item in user.get("roles", [])]
+            user_roles = user.get("roles", [])
             
             if any(role in user_roles for role in roles):
                 return fn(*args, **kwargs)
@@ -42,6 +44,3 @@ from app.blueprints.cars import car_bp
 main_bp.register_blueprint(car_bp, url_prefix='/car')
 from app.blueprints.rentals import rental_bp
 main_bp.register_blueprint(rental_bp, url_prefix='/rental')
-
-from app.main import routes
-from app.models import *
