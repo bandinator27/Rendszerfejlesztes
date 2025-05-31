@@ -1,5 +1,5 @@
 ﻿{% extends "base.html" %}
-{% block title %}Saját fiókom{% endblock %}
+{% block title %} My account {% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -24,7 +24,7 @@
     </div>
 
     <div class="text-center">
-        <a href="/user/roles" class="btn btn-outline-primary mt-4">Szerepkörök (JSON)</a>
+        <a href="/user/roles" class="btn btn-outline-primary mt-4">Roles (JSON)</a>
     </div>
 
 {% endblock %}

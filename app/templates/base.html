@@ -11,40 +11,43 @@
 <body>
     <nav class="navbar navbar-expand-md bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/">Bérautó</a>
+            <a class="navbar-brand fw-bold" href="/">Car Rental</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/">Főoldal</a>
+                        <a class="nav-link {% if request.path == '/' %} active {% endif %}" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/cars">Autók</a>
+                        <a class="nav-link {% if request.path == '/cars/' %} active {% endif %}" href="/cars">Cars</a>
                     </li>
-                    {% if session["user"] %}
+                    {% if session.get("user") %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="/logout">Kilépés</a>
+                        <a class="nav-link active" href="/logout">Logout</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="/login">Belépés</a>
+                        <a class="nav-link {% if request.path == '/login/' %} active {% endif %} " href="/login">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/register/' %} active {% endif %}" href="/register">Register</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="/user/user_view">Felhasználók</a>
+                        <a class="nav-link" href="/user/user_view">Users</a>
                     </li>
                     {% if session["role"] == "Administrator" %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="/admin">Admin Panel</a>
+                        <a class="nav-link {% if request.path == '/admin/' %} active {% endif %}" href="/admin">Admin</a>
                     </li>
                     {% endif %}
                 </ul>
                 {% if session["user"] %}
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/account">Fiók</a>
+                        <a class="nav-link" href="/account">Account</a>
                     </li>
                 </ul>
                 {% endif %}

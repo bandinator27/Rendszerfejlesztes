@@ -1,5 +1,5 @@
 ﻿{% extends "base.html" %}
-{% block title %} Összes autó {% endblock %}
+{% block title %} All cars {% endblock %}
 {% block content %}
 	{% with messages = get_flashed_messages() %}
 		{% if messages %}
@@ -13,13 +13,13 @@
     <div class="col-lg-3 col-sm-8 my-4">
         <form action="{{ url_for('main.cars') }}" method="get">
             <div class="input-group">
-                <input type="number" name="cid" class="form-control" placeholder="Autó ID" required>
-                <button class="btn btn-outline-light" type="submit">Szűrés</button>
+                <input type="number" name="cid" class="form-control" placeholder="Car ID" required>
+                <button class="btn btn-outline-light" type="submit">Show</button>
             </div>
         </form>
     </div>
     <div class="col-auto my-4">
-        <a href="/car/view_cars" class="btn btn-outline-info" target="_blank">Összes autó (JSON)</a>
+        <a href="/car/view_cars" class="btn btn-outline-info" target="_blank">All cars (JSON)</a>
     </div>
 </div>
 
