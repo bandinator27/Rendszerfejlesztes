@@ -8,7 +8,7 @@ from app.models.rentals import *
 from app.models.roles import *
 from app.models.users import *
 from werkzeug.security import check_password_hash
-from sqlalchemy import or_
+from sqlalchemy import select
 from werkzeug.security import generate_password_hash
 
 @main_bp.route("/")
@@ -19,22 +19,34 @@ def home():
        user = "None"
    return render_template('index.html', user = user)
 
+# bejelentkezés
 @main_bp.route("/login/", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-
         user = db.session.query(Users).filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             session['user'] = user.username
-            session['role'] = getattr(user, 'role', None)
-            flash("Sikeres bejelentkezés!", "success")
+
+            # ha a felhasználónak több szerepköre is van, akkor a legmagasabb szintűt fogjuk használni
+            all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
+            role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
+            
+            user_role_names = [role.role_name for role in user.roles]
+
+            primary_role = None
+            for role_in_hierarchy in role_hierarchy:
+                if role_in_hierarchy in user_role_names:
+                    primary_role = role_in_hierarchy
+                    break
+            session['role'] = primary_role
+            # print(f"DEBUG: session['role'] is now set to: {session['role']}")
+            flash("Bejelentkeztél!", "info")
             return redirect(url_for('main.home'))
         else:
-            flash("Hibás felhasználónév vagy jelszó!", "danger")
+            flash("Hibás bejelentkezési adatok!", "danger")
             return render_template('login.html', register=url_for('main.register'))
-
     return render_template('login.html', register = url_for('main.register'))
 
 # regisztráció
@@ -94,13 +106,13 @@ def logout():
        session.pop("user", None)
        session.pop("role", None)
        flash("Kijelentkeztél!", "info")
-   return redirect(url_for("main.login"))
+   return redirect(url_for("main.home"))
 
 @main_bp.route("/admin/")
 def admin_page():
    if "role" in session:
        role = session["role"]
-       if role == "Admin":
+       if role == "Administrator":
            return render_template('admin.html')
        else:
            return redirect(url_for("main.home"))

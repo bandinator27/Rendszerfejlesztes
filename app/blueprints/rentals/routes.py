@@ -5,9 +5,9 @@ from app.blueprints.rentals.service import RentalsService
 from app.database import auth
 from app.blueprints import role_required
 
-@rental_bp.route('/')
-def index():
-    return 'Ez a foglalások Blueprint'
+# @rental_bp.route('/')
+# def index():
+#     return 'Ez a foglalások Blueprint'
 
 @rental_bp.get('/view_rentals')
 @rental_bp.doc(tags=["rentals"])
@@ -37,6 +37,26 @@ def rent_car(cid, json_data):
 #@role_required(["User"])
 def set_car_rentstatus(cid, json_data):
     success, response = RentalsService.set_car_rentstatus(cid, json_data)
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+@rental_bp.post('/approve/<int:carid>')
+@rental_bp.auth_required(auth)
+@role_required(["Administrator"])
+def approve_rental(carid, json_data):
+    renterid = json_data.get("renterid")
+    success, response = RentalsService.approve_rental(carid, renterid)
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+@rental_bp.post('/stop/<int:carid>')
+@rental_bp.auth_required(auth)
+@role_required(["Administrator"])
+def stop_rental(carid, json_data):
+    renterid = json_data.get("renterid")
+    success, response = RentalsService.set_car_rentstatus(carid, {"renterid": renterid, "rentstatus": "Elérhető"})
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)

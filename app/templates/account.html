@@ -1,11 +1,10 @@
 ﻿{% extends "base.html" %}
-{% block title %}View all users{% endblock %}
+{% block title %}Saját fiókom{% endblock %}
 {% block content %}
-<div class="container">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     {% for msg in messages %}
-    <p>{{msg}}</p>
+        <p>{{msg}}</p>
     {% endfor %}
     {% endif %}
     {% endwith %}
@@ -15,15 +14,17 @@
                 <tr><th>ID</th><td>{{ userAccount.id }}</td></tr>
                 <tr><th>Name</th><td>{{ userAccount.username }}</td></tr>
                 <tr><th>Password</th><td>{{ userAccount.password }}</td></tr>
-                {# <tr><th>Password Salt</th><td>{{ userAccount.password_salt }}</td></tr> #}
+                {#
+                <tr><th>Password Salt</th><td>{{ userAccount.password_salt }}</td></tr> #}
                 <tr><th>Email</th><td>{{ userAccount.email }}</td></tr>
                 <tr><th>Address</th><td>{{ userAccount.address.postalcode }} {{ userAccount.address.city }}, {{ userAccount.address.street }}</td></tr>
                 <tr><th>Phone number</th><td>{{ userAccount.phone_number }}</td></tr>
             </tbody>
         </table>
     </div>
+
     <div class="text-center">
-        <a href="/user/roles" class="btn btn-outline-light mt-4">Szerepkörök (JSON)</a>
+        <a href="/user/roles" class="btn btn-outline-primary mt-4">Szerepkörök (JSON)</a>
     </div>
-</div> <!--container-->
+
 {% endblock %}

@@ -1,51 +1,41 @@
 ﻿{% extends "base.html" %}
-{% block title %}Bejelentkezés{% endblock %}
+{% block title %} Bejelentkezés {% endblock %}
 {% block content %}
-<div class="container text-center mt-4">
-	<div class="row justify-content-center">
-		{% with messages = get_flashed_messages(with_categories = True) %}
-		{% if messages %}
+	{% with messages = get_flashed_messages(with_categories = True) %}
+	{% if messages %}
 		{% for category, msg in messages %}
-			{% set icon_type =
-				"check-circle" if category == "success"
-				else "info-circle" if category == "info"
-				else "exclamation-circle" if category == "danger"
-			%}
-		<div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-4" role="alert">
-			<i class="bi bi-{{ icon_type }} pe-2"></i>
-			<div>
-				{{ msg }}
-				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		{% set icon_type =
+		"check-circle" if category == "success"
+		else "info-circle" if category == "info"
+		%}
+		<div class="row justify-content-center text-center mt-4">
+			<div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-4">
+				<i class="bi bi-{{ icon_type }} pe-2"></i>
+				<div>
+					{{ msg }}
+					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+				</div>
 			</div>
 		</div>
 		{% endfor %}
-		{% endif %}
-		{% endwith %}
-	</div>
+	{% endif %}
+	{% endwith %}
 
-	<div class="row justify-content-center">
-		<form action="{{ url_for('main.login') }}" method="post" class="col-sm-6 col-lg-4">
-			<div class="form-floating mb-3">
-				<input type="text"
-					   class="form-control"
-					   name="username"
-					   placeholder="Felhasználónév" />
-				<label for="username">Felhasználónév</label>
-			</div>
-			<div class="form-floating mb-3">
-				<input type="password"
-					   class="form-control"
-					   name="password"
-					   placeholder="Password" />
-				<label for="password">Jelszó</label>
-			</div>
-			<div class="d-grid gap-2 d-md-block my-2">
-				<button class="btn btn-primary" type="submit">Bejelentkezés</button>
-				<a class="btn btn-secondary" href="{{ url_for('main.register') }}">
-					Regisztráció
-				</a>
-			</div>
-		</form>
-	</div>
+<div class="row justify-content-center mt-4">
+	<form action="{{ url_for('main.login') }}" method="post" id="loginForm" class="col-sm-6 col-lg-4">
+		<div class="form-floating mb-3">
+			<input type="text" class="form-control" name="username" placeholder="Felhasználónév">
+			<label for="username">Felhasználónév</label>
+		</div>
+		<div class="form-floating mb-3">
+			<input type="password" class="form-control" name="password" placeholder="Password">
+			<label for="password">Jelszó</label>
+		</div>
+		<div class="d-grid gap-2 d-md-block my-2 text-center">
+			<button class="btn btn-primary" type="submit">Bejelentkezés</button>
+			<a class="btn btn-secondary" href="/register">Regisztráció</a>
+		</div>
+	</form>
 </div>
+
 {% endblock %}

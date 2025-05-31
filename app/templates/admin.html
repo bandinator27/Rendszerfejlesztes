@@ -4,9 +4,9 @@
 	{% with messages = get_flashed_messages() %}
 		{% if messages %}
 			{% for msg in messages %}
-				<p>{{msg}}</p>
+				<p class="pt-2">{{msg}}</p>
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-	<p>Admin panel</p>
+	<p class="pt-2">Admin panel</p>
 {% endblock %}

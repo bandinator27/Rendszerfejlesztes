@@ -31,7 +31,7 @@ class UserService:
             UserService.add_user_role(user.id, "User")
 
         except Exception as ex:
-            return False, f"Hibás felhasználói adatok! ({ex})"
+            return False, f"Hibás felhasználói adatok! Részletek: {ex}"
         return True, {
             "message": "Sikeres regisztráció!",
             "user": UserResponseSchema().dump(user)
@@ -52,8 +52,6 @@ class UserService:
         user_schema = UserResponseSchema().dump(user)
         user_schema["token"] = UserService.token_generate(user)
         return True, UserResponseSchema().dump(user_schema)   
-        #except Exception as ex:
-        #    return False, "Incorrect login data!"
     
     @staticmethod
     def user_view():
@@ -70,37 +68,34 @@ class UserService:
         payload = PayloadSchema()
         payload.exp = int((datetime.now()+timedelta(minutes=30)).timestamp())
         payload.user_id = user.id
-        roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "Administrator")).scalar_one_or_none()
+        roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "Administrator")).scalar_one_or_none()
         if roles is None:
-            roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "Clerk")).scalar_one_or_none()
+            roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "Clerk")).scalar_one_or_none()
             if roles is None:
-                roles = db.session.execute(select(Roles).filter(Roles.id == user.id, Roles.role_name == "User")).scalar_one_or_none()
+                roles = db.session.execute(select(Roles).filter(Roles.id==user.id, Roles.role_name == "User")).scalar_one_or_none()
                 if roles is None:
-                    payload.roles = ["None"]
+                    payload.roles = "None"
                 else:
-                    payload.roles = ["User"]
+                    payload.roles = "User"
             else:
-                payload.roles = ["Clerk"]
+                payload.roles = "Clerk"
         else:
-            payload.roles = ["Administrator"]
+            payload.roles = "Administrator"
 
-        return jwt.encode({'alg': 'HS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
-    
+        return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
+
     @staticmethod
-    def list_roles(user_id):
-        #roles = db.session.get(Roles, user_id)
-        roles = db.session.execute(select(Roles).filter(Roles.id==user_id)).scalars()
-        #roles = db.session.query(Roles).all()
-        if roles is None:
-            return False, "User not found!"
-        
-        return True, RoleSchema().dump(roles, many = True)
+    def list_roles(uid):
+        user = db.session.get(Users, uid)
+        if user is None:
+            return False, "Felhaszáló nem található"
+        return True, RoleSchema().dump(obj=user.roles, many=True)
     
     @staticmethod
     def get_user_data(user_id):
         user = db.session.execute(select(Users).filter(Users.email == user_id)).scalar_one_or_none()
         if user is None:
-            return False, "User not found!"
+            return False, "Felhasználó nem található!"
         return True, UserResponseSchema().dump(user)
     
     @staticmethod
@@ -124,17 +119,16 @@ class UserService:
                     user.address_id = addr.id
 
                 db.session.commit()
-
         except Exception as ex:
             return False, f"Váratlan hiba történt! (set_user_data) Részletek: {ex}"
 
     @staticmethod
     def add_user_role(user_id, role_name):
         try:
-            roles = Roles(id=user_id, role_name=role_name)
-            db.session.add(roles)
+            role = Roles(id=user_id, role_name=role_name)
+            db.session.add(role)
             db.session.commit()
-            return True, RoleSchema().dump(roles)
+            return True, RoleSchema().dump(role)
         except Exception as ex:
             db.session.rollback()  # Rollback hiba esetén
             return False, f"Adatbázis hiba! (add_user_role) Részletek: {ex}"
@@ -142,15 +136,15 @@ class UserService:
     @staticmethod
     def remove_user_role(user_id, role_name):
         try:
-            roles = db.session.execute(select(Roles).filter(Roles.id == user_id, Roles.role_name == role_name)).scalar_one()
+            role = db.session.execute(select(Roles).filter(Roles.id == user_id, Roles.role_name == role_name)).scalar_one()
             db.session.commit()
-            return True, RoleSchema().dump(roles)
+            return True, RoleSchema().dump(role)
         except Exception as ex:
             return False, f"Adatbázis hiba! (remove_user_role) Részletek: {ex}"
-        
+
     @staticmethod
     def get_user_roles(user_id):
-        roles = db.session.execute(select(Roles).filter(Roles.id==user_id)).scalars()
+        roles = db.session.execute(select(Roles.role_name).filter(Roles.id==user_id)).scalars().all()
         if roles is None:
             return False, "A felhasználó vagy a szerepkör nem található!"
         return True, RoleSchema().dump(roles, many = True)

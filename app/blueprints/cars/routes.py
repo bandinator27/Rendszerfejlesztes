@@ -5,9 +5,9 @@ from app.blueprints.cars.service import CarsService
 from app.database import auth
 from app.blueprints import role_required
 
-@car_bp.route('/')
-def index():
-    return 'Ez az autók Blueprint'
+# @car_bp.route('/')
+# def index():
+#     return 'Ez az autók Blueprint'
 
 @car_bp.get('/view_cars')
 @car_bp.doc(tags=["car"])

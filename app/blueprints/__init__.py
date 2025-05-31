@@ -1,13 +1,12 @@
 ﻿from apiflask import APIBlueprint
-
-main_bp = APIBlueprint('main', __name__, tag="main")
-
 from app.database import auth
 from flask import current_app
 from authlib.jose import jwt
 from datetime import datetime
 from apiflask import HTTPError
 from functools import wraps
+
+main_bp = APIBlueprint('main', __name__, tag="main")
 
 @auth.verify_token
 def verify_token(token):
@@ -28,12 +27,12 @@ def role_required(roles):
         def decorated_function(*args, **kwargs):
             user = getattr(auth, "current_user", None)
             if not user or not user.get("roles"):
-                raise HTTPError(message="Hozzáférés megtaggadva", status_code=403)
+                raise HTTPError(message="Hozzáférés megtagadva", status_code=403)
             #user_roles = [item.get("role_name") for item in user.get("roles", [])]
             user_roles = user.get("roles", []) # G
             if any(role in user_roles for role in roles):
                 return fn(*args, **kwargs)
-            raise HTTPError(message="Hozzáférés megtaggadva", status_code=403)
+            raise HTTPError(message="Hozzáférés megtagadva", status_code=403)
         return decorated_function
     return wrapper
 
