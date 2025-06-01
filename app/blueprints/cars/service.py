@@ -42,22 +42,21 @@ class CarsService:
                 car.fueltype = request["fueltype"]
                 car.topspeed = request["topspeed"]
                 car.power = request["power"]
-                car.torque = request["torque"]
+                car.kmcount = request["kmcount"]
                 car.enginetype = request["enginetype"]
                 car.extras = request["extras"]
                 db.session.commit()
-                return True, "Success"
+                return True, "Car added to database!"
                     
         except Exception as ex:
             return False, f"Database or server error! Details: {ex}"
         
     @staticmethod
     def add_car(request):
-        #try:
-        car = Cars(**request)
-        db.session.add(car)
-        db.session.commit()
-        return True, "Success!"
-                    
-        #except Exception as ex:
-        #    return False, "Something went wrong"
+        try:
+            car = Cars(**request)
+            db.session.add(car)
+            db.session.commit()
+            return True, "Success! (add_car)"
+        except Exception as ex:
+            return False, f"Something went wrong: {ex}"

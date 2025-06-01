@@ -1,5 +1,5 @@
-from app.database import db, Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.database import db
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import String
 
 class Cars(db.Model):
@@ -19,6 +19,6 @@ class Cars(db.Model):
     fueltype: Mapped[str] = mapped_column(String(32))
     topspeed: Mapped[int]
     power: Mapped[int]
-    torque: Mapped[int]
+    kmcount: Mapped[int]
     enginetype: Mapped[str] = mapped_column(String(32))
     extras: Mapped[str] = mapped_column(String(100))

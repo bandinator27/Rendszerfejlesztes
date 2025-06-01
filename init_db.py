@@ -67,9 +67,9 @@ admin.roles.append(db.session.get(Roles, 3))
 
 # --- CARS test data
 db.session.add_all([
-        Cars(numberplate="ERT-555", rentable=1, price=5000, manufacturer="Tesla", model="Y", color="Silver", seats=4, interior="Dark", bodytype="Sedan", gearbox="automatic", doors=4, fueltype="Electric", topspeed=330, power=415, torque=1025, enginetype="Electric", extras="ABS, heated seats"),
-        Cars(numberplate="ABC-123", rentable=1, price=1000, manufacturer="Audi", model="A1", color="Black", seats=4, interior="Light", bodytype="Hatchback", gearbox="manual", doors=4, fueltype="Diesel", topspeed=270, power=105, torque=200, enginetype="1.9l TDI", extras="ABS"),
-        Cars(numberplate="DEF-456", rentable=0, price=4000, manufacturer="Skoda", model="Superb", color="Navy Blue", seats=4, interior="Beige", bodytype="Sedan", gearbox="automatic", doors=5, fueltype="Gasoline", topspeed=280, power=185, torque=200, enginetype="2l", extras="ABS, ACC")
+        Cars(numberplate="ERT-555", rentable=1, price=5000, manufacturer="Tesla", model="Y", color="Silver", seats=4, interior="Dark", bodytype="Sedan", gearbox="automatic", doors=4, fueltype="Electric", topspeed=330, power=415, kmcount=12000, enginetype="Electric", extras="ABS, heated seats"),
+        Cars(numberplate="ABC-123", rentable=1, price=1000, manufacturer="Audi", model="A1", color="Black", seats=4, interior="Light", bodytype="Hatchback", gearbox="manual", doors=4, fueltype="Diesel", topspeed=270, power=105, kmcount=2000, enginetype="1.9l TDI", extras="ABS"),
+        Cars(numberplate="DEF-456", rentable=0, price=4000, manufacturer="Skoda", model="Superb", color="Navy Blue", seats=4, interior="Beige", bodytype="Sedan", gearbox="automatic", doors=5, fueltype="Gasoline", topspeed=280, power=185, kmcount=23420, enginetype="2l", extras="ABS, ACC")
     ])
 
 # --- RENTALS test data

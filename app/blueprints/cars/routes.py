@@ -18,7 +18,7 @@ def view_cars():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@car_bp.get('/<int:cid>')
+@car_bp.get('/list/<int:cid>')
 @car_bp.doc(tags=["car"])
 @car_bp.output(CarsSchema())
 def get_car_data(cid):
@@ -31,8 +31,7 @@ def get_car_data(cid):
 @car_bp.doc(tags=["car"])
 @car_bp.input(CarsSchema, location="json")
 @car_bp.auth_required(auth)
-@role_required(["User"])
-@role_required(["Clerk", "Administrator"])
+@role_required(["Administrator"])
 def set_car_data(cid, json_data):
     success, response = CarsService.set_car_data(cid, json_data)
     if success:

@@ -1,5 +1,4 @@
 from marshmallow import Schema, fields
-from apiflask.fields import String, Integer
 
 class CarsSchema(Schema):
     carid = fields.Integer()
@@ -17,6 +16,6 @@ class CarsSchema(Schema):
     fueltype = fields.String()
     topspeed = fields.Integer()
     power = fields.Integer()
-    torque = fields.Integer()
+    kmcount = fields.Integer()
     enginetype = fields.String()
     extras = fields.String()
