@@ -27,7 +27,7 @@ def get_car_data(cid):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@car_bp.post('/<int:cid>')
+@car_bp.post('/set/<int:cid>')
 @car_bp.doc(tags=["car"])
 @car_bp.input(CarsSchema, location="json")
 @car_bp.auth_required(auth)
@@ -45,6 +45,16 @@ def set_car_data(cid, json_data):
 @role_required(["Administrator"])
 def add_car(json_data):
     success, response = CarsService.add_car(json_data)
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+@car_bp.delete('/remove/<int:cid>')
+@car_bp.doc(tags=["car"])
+@car_bp.auth_required(auth)
+@role_required(["Administrator"])
+def remove_car(cid):
+    success, response = CarsService.remove_car(cid)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)

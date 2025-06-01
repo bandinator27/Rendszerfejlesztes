@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 
 class CarsSchema(Schema):
-    carid = fields.Integer()
+    carid = fields.Integer(dump_only=True)
     numberplate = fields.String()
     rentable = fields.Integer()
     price = fields.Integer()

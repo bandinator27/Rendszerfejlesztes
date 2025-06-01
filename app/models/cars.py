@@ -4,7 +4,7 @@ from sqlalchemy.types import String
 
 class Cars(db.Model):
     __tablename__ = "Cars"
-    carid: Mapped[int] = mapped_column(primary_key = True)
+    carid: Mapped[int] = mapped_column(primary_key = True, autoincrement=True)
     numberplate: Mapped[str] = mapped_column(String(32))
     rentable: Mapped[int]
     price: Mapped[int]
