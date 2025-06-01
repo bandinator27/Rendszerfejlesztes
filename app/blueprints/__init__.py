@@ -5,7 +5,6 @@ from authlib.jose import jwt
 from datetime import datetime
 from apiflask import HTTPError
 from functools import wraps
-from app.models import *
 
 main_bp = APIBlueprint('main', __name__, tag="main")
 
@@ -44,3 +43,6 @@ from app.blueprints.cars import car_bp
 main_bp.register_blueprint(car_bp, url_prefix='/car')
 from app.blueprints.rentals import rental_bp
 main_bp.register_blueprint(rental_bp, url_prefix='/rental')
+
+from app.models import *
+from app.main import routes

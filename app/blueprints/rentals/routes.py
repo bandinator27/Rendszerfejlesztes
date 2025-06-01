@@ -11,6 +11,7 @@ from app.database import db
 # def index():
 #     return 'This is the rentals Blueprint'
 
+# --- View rentals
 @rental_bp.get('/view_rentals')
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.output(RentalsSchema(many = True))
@@ -47,8 +48,8 @@ def rent_car(cid, json_data):
         if success:
             return response, 200
         return {"message": response}, 400
-    except Exception as e:
-        return {"message": f"Error: {str(e)}"}, 400
+    except Exception as ex:
+        return {"message": f"Error: {ex}"}, 400
 
 @rental_bp.post('/rentstatus/<int:cid>')
 @rental_bp.doc(tags=["rentals"])
@@ -61,6 +62,7 @@ def set_car_rentstatus(cid, json_data):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+# --- Approving a rental
 @rental_bp.post('/approve/<int:carid>/<int:renterid>')
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.auth_required(auth)
@@ -72,12 +74,15 @@ def approve_rental(carid, renterid):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@rental_bp.post('/stop/<int:carid>')
+# --- Stopping a rental
+@rental_bp.post('/stop/<int:carid>/<int:renterid>')
 @rental_bp.auth_required(auth)
-@role_required(["Administrator"])
-def stop_rental(carid, json_data):
-    renterid = json_data.get("renterid")
-    success, response = RentalsService.set_car_rentstatus(carid, {"renterid": renterid, "rentstatus": "Elérhető"})
-    if success:
-        return response, 200
-    raise HTTPError(message=response, status_code=400)
+@role_required(["Clerk", "Administrator"])
+def stop_rental(carid, renterid):
+    try:
+        success, response = RentalsService.set_car_rentstatus(carid, {"renterid": renterid, "rentstatus": "Available"})
+        if success:
+            return response, 200
+        raise HTTPError(message=response, status_code=400)
+    except Exception as ex:
+        return {"message": f"Error: {ex}"}, 400

@@ -13,6 +13,7 @@ class RentalsService:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rental, many=True)
 
+# --- RENTING
     @staticmethod
     def rent_car(carid, request):
         try:
@@ -56,8 +57,9 @@ class RentalsService:
 
         except Exception as ex:
             db.session.rollback() # Rollback in case of error
-            return False, f"Database error (rent_car service). Details: {str(ex)}"
+            return False, f"Database error (rent_car service). Details: {ex}"
 
+# --- APPROVE RENTAL
     @staticmethod
     def approve_rental(carid, renterid):
         try:
@@ -73,22 +75,24 @@ class RentalsService:
             rental.rentstatus = "Rented"
             db.session.add(rental)
             db.session.commit()
+            
             return True, RentalsSchema().dump(rental) # Return updated rental data
         except Exception as ex:
             db.session.rollback()
             return False, f"Error while approving rental. Details: {ex}"
-    
+
+# --- SET RENTAL STATUS (stop rental)
     @staticmethod
     def set_car_rentstatus(carid, request):
         try:
             renterid = request["renterid"]
             rental = db.session.get(Rentals, (carid, renterid))
             if rental is None:
-                return False, "This rental does not exist"
+                return False, "This rental does not exist."
 
             rental.rentstatus = request["rentstatus"]
             db.session.commit()
 
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
-        return True, "Success"
+        return True, "Rental stopped, car marked as available."
