@@ -9,6 +9,7 @@ from app.blueprints import role_required
 # def index():
 #     return 'This is the cars Blueprint'
 
+# --- List all cars
 @car_bp.get('/view_cars')
 @car_bp.doc(tags=["car"])
 @car_bp.output(CarsSchema(many = True))
@@ -18,11 +19,23 @@ def view_cars():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+# --- View one car with given id (basically search)
 @car_bp.get('/list/<int:cid>')
 @car_bp.doc(tags=["car"])
 @car_bp.output(CarsSchema())
 def get_car_data(cid):
     success, response = CarsService.get_car_data(cid)
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+# --- List available cars
+@car_bp.get('/list_available')
+@car_bp.doc(tags=["car"])
+@car_bp.auth_required(auth)
+@car_bp.output(CarsSchema(many=True))
+def list_available():
+    success, response = CarsService.list_available()
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)

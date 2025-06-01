@@ -2,14 +2,14 @@ User:
 - [x] Registration
 - [x] View car data
 - [x] Request rental
+- [x] List rentable cars
 - [ ] Modify personal data (address, phone number)
-- [ ] List rentable cars
 
 Clerk:
 - [x] Approve rentals
 - [x] Accept car returns
 - [x] View all rentals
-- [ ] Set cars' rent status
+- [x] Set cars' rent status
 - [ ] Create invoices
 
 Administrator:

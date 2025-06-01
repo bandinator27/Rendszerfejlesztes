@@ -1,6 +1,7 @@
 ﻿from app.database import db
 from app.blueprints.rentals.schemas import RentalsSchema
 from app.models.rentals import Rentals
+from app.models.cars import Cars
 from sqlalchemy import select
 from datetime import datetime
 
@@ -48,12 +49,18 @@ class RentalsService:
             if active_rental:
                 return False, f"Car #{carid} is currently unavailable."
 
+            # Set the car to rentable=0
+            car = db.session.get(Cars, carid)
+            if not car:
+                return False, f"Car #{carid} not found."
+            car.rentable = 0
+
             # Otherwise create new rental
-            rent = Rentals(**request)
-            db.session.add(rent)
+            rental = Rentals(**request)
+            db.session.add(rental)
             db.session.commit()
 
-            return True, RentalsSchema().dump(rent)
+            return True, RentalsSchema().dump(rental)
 
         except Exception as ex:
             db.session.rollback() # Rollback in case of error
@@ -81,7 +88,7 @@ class RentalsService:
             db.session.rollback()
             return False, f"Error while approving rental. Details: {ex}"
 
-# --- SET RENTAL STATUS (stop rental)
+# --- SET RENTAL STATUS
     @staticmethod
     def set_car_rentstatus(carid, request):
         try:
@@ -91,6 +98,11 @@ class RentalsService:
                 return False, "This rental does not exist."
 
             rental.rentstatus = request["rentstatus"]
+            # If the rental is being marked as available, set rentable to 1
+            if request["rentstatus"] in ["Available"]:
+                car = db.session.get(Cars, carid)
+            if car:
+                car.rentable = 1
             db.session.commit()
 
         except Exception as ex:

@@ -25,6 +25,15 @@ class CarsService:
             return False, f"Database or server error! Details: {ex}"
         return True, CarsSchema().dump(cars)
 
+# --- List available cars
+    @staticmethod
+    def list_available():
+        try:
+            cars = db.session.query(Cars).filter(Cars.rentable == 1).all()
+        except Exception as ex:
+            return False, f"Database or server error! Details: {ex}"
+        return True, CarsSchema().dump(cars, many=True)
+
 # --- Set car data
     @staticmethod
     def set_car_data(cid, request):

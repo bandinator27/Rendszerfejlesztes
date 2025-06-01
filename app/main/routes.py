@@ -116,7 +116,7 @@ def admin_page():
            return redirect(url_for("main.home"))
    else:
        return redirect(url_for("main.home"))
-    
+
 @main_bp.route("/account/")
 def account():
    if "user" in session:
@@ -129,8 +129,8 @@ def account():
    else:
        return redirect(url_for("main.home"))
 
-# egyszerűbb szerepkör listázás
-@user_bp.get('/roles')
+# --- List all roles
+@main_bp.get('/list_roles')
 def list_all_roles():
     from app.models.roles import Roles
     roles = Roles.query.all()

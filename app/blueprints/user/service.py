@@ -87,13 +87,6 @@ class UserService:
                           current_app.config['SECRET_KEY']).decode()
 
     @staticmethod
-    def list_roles(uid):
-        user = db.session.get(Users, uid)
-        if user is None:
-            return False, "User not found! (list_roles)"
-        return True, RoleSchema().dump(obj=user.roles, many=True)
-    
-    @staticmethod
     def get_user_data(user_id):
         user = db.session.execute(select(Users).filter(Users.email == user_id)).scalar_one_or_none()
         if user is None:
@@ -109,19 +102,32 @@ class UserService:
                 user.email = request["email"]
                 user.set_password(request["password"])
                 user.phone_number = request["phone_number"]
-                address = request["Address"]
-                addr = db.session.execute(select(Addresses).filter(Addresses.city == address.city,
-                   Addresses.street == address.street,
-                   Addresses.postalcode == address.postalcode)).scalar_one_or_none()
+                address = request["address"]
+
+                addr = db.session.execute(
+                    select(Addresses).filter(
+                        Addresses.city == address["city"],
+                        Addresses.street == address["street"],
+                        Addresses.postalcode == address["postalcode"]
+                    )).scalar_one_or_none()
                 if addr is None:
-                    new_address = Addresses(address.city, address.street, address.postalcode)
+                    new_address = Addresses(
+                        city=address["city"],
+                        street=address["street"],
+                        postalcode=address["postalcode"]
+                    )
                     db.session.add(new_address)
                     db.session.commit()
+                    user.address_id = new_address.id
                 else:
                     user.address_id = addr.id
 
                 db.session.commit()
+                return True, "User data updated successfully!"
+            else:
+                return False, "User not found."
         except Exception as ex:
+            db.session.rollback()  # Rollback on error
             return False, f"Database error! (set_user_data) Details: {ex}"
 
     @staticmethod
