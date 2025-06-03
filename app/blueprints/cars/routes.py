@@ -51,6 +51,7 @@ def set_car_data(cid, json_data):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+# --- Add a new car
 @car_bp.post('/add')
 @car_bp.doc(tags=["car"])
 @car_bp.input(CarsSchema, location="json")
@@ -62,6 +63,7 @@ def add_car(json_data):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+# --- Delete a car
 @car_bp.delete('/remove/<int:cid>')
 @car_bp.doc(tags=["car"])
 @car_bp.auth_required(auth)

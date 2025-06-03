@@ -17,3 +17,4 @@ Administrator:
 - [x] View car data
 - [x] Delete cars
 - [x] Modify car data
+- [x] Modify user data

@@ -34,7 +34,7 @@ class CarsService:
             return False, f"Database or server error! Details: {ex}"
         return True, CarsSchema().dump(cars, many=True)
 
-# --- Set car data
+# --- Set car data (modify)
     @staticmethod
     def set_car_data(cid, request):
         try:
@@ -70,7 +70,7 @@ class CarsService:
             car = Cars(**request)
             db.session.add(car)
             db.session.commit()
-            return True, "Success! (add_car)"
+            return True, "Successfully added the car to the database!"
         except Exception as ex:
             return False, f"Something went wrong while adding the car: {ex}"
 
@@ -92,7 +92,8 @@ class CarsService:
             return False, "Car cannot be deleted: currently rented or pending rental."
 
         try:
-            db.session.delete(car) # 3. Delete the car
+            # 3. Delete the car
+            db.session.delete(car)
             db.session.commit()
             return True, f"Car with ID:{cid} has been deleted."
         except Exception as ex:

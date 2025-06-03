@@ -1,4 +1,5 @@
-﻿from app.blueprints.user import user_bp
+﻿from app.blueprints import role_required
+from app.blueprints.user import user_bp
 from app.blueprints.user.schemas import UserRequestSchema, UserResponseSchema
 from app.blueprints.user.schemas import UserLoginSchema
 from app.blueprints.user.schemas import RoleSchema
@@ -42,11 +43,13 @@ def user_list_roles():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@user_bp.get('/user_view')
+@user_bp.get('/list_users')
 @user_bp.doc(tags=["user"])
+@user_bp.auth_required(auth)
+@role_required(["Clerk", "Administrator"])
 @user_bp.output(UserResponseSchema(many = True))
 def user_view():
-    success, response = UserService.user_view()
+    success, response = UserService.list_users()
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
@@ -67,8 +70,7 @@ def get_user_data(uid):
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.auth_required(auth)
-#@role_required(["User"])
-#@role_required(["Clerk", "Administrator"])
+@role_required(["Clerk", "Administrator"])
 def set_user_data(uid, json_data):
     success, response = UserService.set_user_data(uid, json_data)
     if success:

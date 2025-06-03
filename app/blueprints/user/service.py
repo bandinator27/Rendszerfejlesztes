@@ -10,6 +10,8 @@ from sqlalchemy import select
 from werkzeug.security import generate_password_hash
 
 class UserService:
+
+# --- Registration
     @staticmethod
     def user_register(request):
         try:
@@ -35,7 +37,8 @@ class UserService:
             "message": "Successful registration!",
             "user": UserResponseSchema().dump(user)
         }
-    
+
+# --- Login
     @staticmethod
     def user_login(request):
         try:
@@ -62,13 +65,14 @@ class UserService:
                 "message": f"Login error: {ex}",
                 "error_type": "server_error"
             }
-    
+
+# --- List users
     @staticmethod
-    def user_view():
+    def list_users():
         try:
             user = db.session.query(Users).all()
         except Exception as ex:
-            return False, f"Data error! (user_view) Details: {ex}"
+            return False, f"Database error! (user_view) Details: {ex}"
         return True, UserResponseSchema().dump(user, many=True)
     
     @staticmethod
