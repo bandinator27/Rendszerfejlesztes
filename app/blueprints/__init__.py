@@ -28,12 +28,12 @@ def role_required(roles):
             user = getattr(auth, "current_user", None)
             
             if not user or not user.get("roles"):
-                raise HTTPError(message="Access denied", status_code=403)
+                raise HTTPError(message="Access denied.", status_code=403)
             user_roles = user.get("roles", [])
             
             if any(role in user_roles for role in roles):
                 return fn(*args, **kwargs)
-            raise HTTPError(message="Access denied", status_code=403)
+            raise HTTPError(message="You don't have access to this command.", status_code=403)
         return decorated_function
     return wrapper
 

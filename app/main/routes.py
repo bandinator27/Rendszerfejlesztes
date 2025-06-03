@@ -18,7 +18,7 @@ def home():
        user = "None"
    return render_template('index.html', user = user)
 
-# bejelentkezés
+# --- Login
 @main_bp.route("/login/", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -47,7 +47,7 @@ def login():
             return render_template('login.html', register=url_for('main.register'))
     return render_template('login.html', register = url_for('main.register'))
 
-# Registration
+# --- Registration
 @main_bp.route("/register/", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -82,12 +82,12 @@ def register():
 
     return render_template('register.html')
 
-# userek kilistázása adatbázis teszteléshez
+# --- List users for testing
 @main_bp.route("/view/")
 def view():
    return render_template('view.html', values=db.session.query(Users).all())
 
-# autók kilistázása adatbázis teszteléshez
+# --- List cars for testing
 @main_bp.route('/cars', methods=['GET'], strict_slashes=False)
 def cars():
     cid = request.args.get('cid', type=int)
@@ -97,15 +97,16 @@ def cars():
         cars = Cars.query.all()
     return render_template('cars.html', values=cars)
 
-# session nullázás
+# --- Terminate session
 @main_bp.route("/logout/")
 def logout():
    if "user" in session:
        session.pop("user", None)
        session.pop("role", None)
-       flash("You're signed out!", "info")
+       flash("You've signed out!", "info")
    return redirect(url_for("main.home"))
 
+# --- Admin page (if signed in as Administrator)
 @main_bp.route("/admin/")
 def admin_page():
    if "role" in session:
@@ -117,6 +118,7 @@ def admin_page():
    else:
        return redirect(url_for("main.home"))
 
+# --- User account page (if signed in)
 @main_bp.route("/account/")
 def account():
    if "user" in session:
@@ -132,6 +134,5 @@ def account():
 # --- List all roles
 @main_bp.get('/list_roles')
 def list_all_roles():
-    from app.models.roles import Roles
     roles = Roles.query.all()
     return {"roles": [r.role_name for r in roles]}

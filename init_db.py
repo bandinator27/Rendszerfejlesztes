@@ -53,7 +53,7 @@ db.session.add_all([
             email="admin@berauto.hu",
             phone_number="+36301234567",
         )])
-
+# role assignments
 bela = db.session.get(Users, 1)
 bela.roles.append(db.session.get(Roles, 2))  # TesztBela User
 

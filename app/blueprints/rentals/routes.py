@@ -74,7 +74,7 @@ def approve_rental(carid, renterid):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-# --- Stopping a rental
+# --- Stop a rental
 @rental_bp.post('/stop/<int:carid>/<int:renterid>')
 @rental_bp.auth_required(auth)
 @role_required(["Clerk", "Administrator"])

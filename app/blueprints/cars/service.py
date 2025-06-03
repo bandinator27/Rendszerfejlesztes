@@ -58,7 +58,7 @@ class CarsService:
                 car.enginetype = request["enginetype"]
                 car.extras = request["extras"]
                 db.session.commit()
-                return True, "Car added to database!"
+                return True, f"ID:{cid} car modifications saved!"
                     
         except Exception as ex:
             return False, f"Database or server error! Details: {ex}"
