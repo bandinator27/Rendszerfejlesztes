@@ -4,7 +4,7 @@ from app.database import db
 from app.models.cars import Cars
 from app.models.rentals import Rentals
 from app.models.roles import Roles
-from app.models.users import Users, UserRole
+from app.models.users import Users
 from app.models.addresses import Addresses
 from werkzeug.security import generate_password_hash
 from datetime import datetime

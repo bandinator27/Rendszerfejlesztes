@@ -38,7 +38,7 @@ def user_register(json_data):
 @user_bp.auth_required(auth)
 #@role_required(["User"])
 def user_list_roles():
-    success, response = UserService.list_roles(auth.current_user.get("user_id"))
+    success, response = UserService.get_user_role(auth.current_user.get("user_id"))
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
@@ -70,12 +70,15 @@ def get_user_data(uid):
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.auth_required(auth)
-@role_required(["Clerk", "Administrator"])
+@role_required(["User", "Clerk", "Administrator"])
 def set_user_data(uid, json_data):
+    current_user_id = auth.current_user.get("user_id")
+    if current_user_id != uid and not set(auth.current_user.get("roles", [])) & {"Administrator"}:
+        raise HTTPError(message="You can only modify your own data. The ID belongs to someone else.", status_code=403)
     success, response = UserService.set_user_data(uid, json_data)
     if success:
         return response, 200
-    raise HTTPError(message = response, status_code = 400)
+    raise HTTPError(message=response, status_code=400)
 
 # @user_bp.post('/remove_role/<int:uid>')
 # @user_bp.doc(tags=["user"])

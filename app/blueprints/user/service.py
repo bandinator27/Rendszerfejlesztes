@@ -127,7 +127,7 @@ class UserService:
                     user.address_id = addr.id
 
                 db.session.commit()
-                return True, "User data updated successfully!"
+                return True, "You've successfully updated your details!"
             else:
                 return False, "User not found."
         except Exception as ex:
@@ -155,8 +155,9 @@ class UserService:
             return False, f"Database error! (remove_user_role) Details: {ex}"
 
     @staticmethod
-    def get_user_roles(user_id):
+    def get_user_role(user_id):
         roles = db.session.execute(select(Roles.role_name).filter(Roles.id==user_id)).scalars().all()
         if not roles:
-            return False, "The user or role cannot be found!"
-        return True, RoleSchema().dump(roles, many = True)
+            return True, []
+        role_dicts = [{"role_name": r} for r in roles]
+        return True, RoleSchema(many=True).dump(role_dicts)

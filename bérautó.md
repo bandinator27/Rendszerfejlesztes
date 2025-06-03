@@ -3,7 +3,7 @@ User:
 - [x] View car data
 - [x] Request rental
 - [x] List rentable cars
-- [ ] Modify personal data (address, phone number, etc.)
+- [x] Modify personal data (address, phone number, etc.)
 
 Clerk:
 - [x] Approve rentals

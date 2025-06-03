@@ -4,9 +4,9 @@
 *$py.class
 *.pyc
 .env
+env/
 .venv
 
 # Flask stuff:
 instance/
 .webassets-cache
-/env
