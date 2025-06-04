@@ -29,6 +29,7 @@ def login():
             session['user'] = user.username
 
             # if the user has multiple roles, determine the primary role based on the hierarchy
+            # the higher the role id, the more important it is
             all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
             role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
             

@@ -20,7 +20,7 @@ def view_cars():
     raise HTTPError(message=response, status_code=400)
 
 # --- View one car with given id (basically search)
-@car_bp.get('/list/<int:cid>')
+@car_bp.get('/view/<int:cid>')
 @car_bp.doc(tags=["car"])
 @car_bp.output(CarsSchema())
 def get_car_data(cid):
@@ -32,7 +32,6 @@ def get_car_data(cid):
 # --- List available cars
 @car_bp.get('/list_available')
 @car_bp.doc(tags=["car"])
-@car_bp.auth_required(auth)
 @car_bp.output(CarsSchema(many=True))
 def list_available():
     success, response = CarsService.list_available()

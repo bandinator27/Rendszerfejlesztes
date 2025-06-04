@@ -21,20 +21,20 @@
 	{% endif %}
 	{% endwith %}
 
-<div class="row justify-content-center mt-4">
-    <form action="{{ url_for('main.login') }}" method="post" id="loginForm" class="col-sm-6 col-lg-4">
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" name="username" placeholder="Username">
-            <label for="username">Username</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="password" class="form-control" name="password" placeholder="Password">
-            <label for="password">Password</label>
-        </div>
-        <div class="d-grid gap-2 d-md-block my-2 text-center">
-            <button class="btn btn-primary" type="submit">Sign in</button>
-        </div>
-    </form>
-</div>
+    <div class="row justify-content-center mt-4">
+        <form action="{{ url_for('main.login') }}" method="post" id="loginForm" class="col-sm-6 col-lg-4">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="username" placeholder="Username">
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" name="password" placeholder="Password">
+                <label for="password">Password</label>
+            </div>
+            <div class="d-grid gap-2 d-md-block my-2 text-center">
+                <button class="btn btn-primary" type="submit">Sign in</button>
+            </div>
+        </form>
+    </div>
 
 {% endblock %}
