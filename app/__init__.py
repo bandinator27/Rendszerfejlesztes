@@ -2,7 +2,7 @@ from flask import Flask
 from apiflask import APIFlask
 from config import Config
 from flask_migrate import Migrate
-from app.database import db
+from app.extensions import db
 from app.blueprints import main_bp
 from flask_cors import CORS
 

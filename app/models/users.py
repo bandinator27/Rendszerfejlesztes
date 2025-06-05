@@ -1,4 +1,4 @@
-from app.database import db, Base
+from app.extensions import db, Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 from werkzeug.security import generate_password_hash, check_password_hash

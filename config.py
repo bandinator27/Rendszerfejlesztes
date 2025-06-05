@@ -6,7 +6,7 @@ class Config:
 
     def load_private_key():
         path = os.path.abspath(os.path.dirname(__file__))
-        key_path = os.path.join(path, "app/secrets", "private-key.pem")
+        key_path = os.path.join(path, "secrets", "private-key.pem")
         with open(key_path, 'r') as f:
             return f.read()
     

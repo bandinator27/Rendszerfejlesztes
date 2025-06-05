@@ -2,7 +2,7 @@
 from app.blueprints.cars.schemas import CarsSchema
 from apiflask import HTTPError
 from app.blueprints.cars.service import CarsService
-from app.database import auth
+from app.extensions import auth
 from app.blueprints import role_required
 
 # @car_bp.route('/')
@@ -54,7 +54,7 @@ def set_car_data(cid, json_data):
 @car_bp.post('/add')
 @car_bp.doc(tags=["car"])
 @car_bp.input(CarsSchema, location="json")
-@car_bp.auth_required(auth)
+#@car_bp.auth_required(auth)
 @role_required(["Administrator"])
 def add_car(json_data):
     success, response = CarsService.add_car(json_data)

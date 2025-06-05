@@ -1,6 +1,6 @@
 from app import create_app
 from config import Config
-from app.database import db
+from app.extensions import db
 from app.models.cars import Cars
 from app.models.rentals import Rentals
 from app.models.roles import Roles

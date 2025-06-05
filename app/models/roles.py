@@ -1,4 +1,4 @@
-from app.database import db
+from app.extensions import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 from typing import List

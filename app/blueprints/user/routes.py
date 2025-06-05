@@ -5,7 +5,7 @@ from app.blueprints.user.schemas import UserLoginSchema
 from app.blueprints.user.schemas import RoleSchema
 from apiflask import HTTPError
 from app.blueprints.user.service import UserService
-from app.database import auth
+from app.extensions import auth
 
 # @user_bp.route('/')
 # def index():
@@ -36,7 +36,6 @@ def user_register(json_data):
 @user_bp.doc(tags=["user"])
 @user_bp.output(RoleSchema(many=True))
 @user_bp.auth_required(auth)
-#@role_required(["User"])
 def user_list_roles():
     success, response = UserService.get_user_role(auth.current_user.get("user_id"))
     if success:

@@ -2,10 +2,10 @@
 from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
 from apiflask import HTTPError
 from app.blueprints.rentals.service import RentalsService
-from app.database import auth
+from app.extensions import auth
 from app.blueprints import role_required
 from app.models.users import Users
-from app.database import db
+from app.extensions import db
 
 # @rental_bp.route('/')
 # def index():

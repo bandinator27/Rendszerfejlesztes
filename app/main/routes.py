@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template, request, session, flash
-from app.database import db
+from app.extensions import db
 from app.models.addresses import Addresses
 from app.blueprints import main_bp, user_bp
 from app.models.cars import *

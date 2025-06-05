@@ -1,4 +1,4 @@
-﻿from app.database import db
+﻿from app.extensions import db
 from app.blueprints.rentals.schemas import RentalsSchema
 from app.models.rentals import Rentals
 from app.models.cars import Cars

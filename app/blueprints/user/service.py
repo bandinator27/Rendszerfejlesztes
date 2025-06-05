@@ -1,4 +1,4 @@
-﻿from app.database import db
+﻿from app.extensions import db
 from app.blueprints.user.schemas import UserResponseSchema, PayloadSchema, RoleSchema
 from app.models.users import Users
 from app.models.addresses import Addresses
@@ -80,15 +80,19 @@ class UserService:
         payload = PayloadSchema()
         payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
         payload.user_id = user.id
-        
-        # Get all roles for current user as a list of strings
-        roles = db.session.execute(select(Roles.role_name).filter(Roles.id == user.id)).scalars().all()
-        if not roles:
-            payload.roles = ["None"]
-        else:
-            payload.roles = list(roles)
-        return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload),
+        payload.roles = RoleSchema().dump(user.roles, many=True)
+        return jwt.encode({'alg': 'RS256'},
+                          PayloadSchema().dump(payload),
                           current_app.config['SECRET_KEY']).decode()
+
+        # # Get all roles for current user as a list of strings
+        # roles = db.session.execute(select(Roles.role_name).filter(Roles.id == user.id)).scalars().all()
+        # if not roles:
+        #     payload.roles = ["None"]
+        # else:
+        #     payload.roles = list(roles)
+        # return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload),
+        #                   current_app.config['SECRET_KEY']).decode()
 
     @staticmethod
     def get_user_data(user_id):
