@@ -14,9 +14,9 @@ from app.extensions import auth
 # --- LOGIN
 @user_bp.post('/login')
 @user_bp.doc(tags=["user"])
-@user_bp.input(UserLoginSchema, location="json")
-def user_login(json_data):
-    success, response = UserService.user_login(json_data)
+@user_bp.input(UserLoginSchema, location="form")
+def user_login(form_data):
+    success, response = UserService.user_login(form_data)
     if success:
         return response, 200
     return response, 401

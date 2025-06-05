@@ -28,9 +28,6 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="/logout">Logout</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/view">Users</a>
-                    </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/login/' %} active {% endif %} " href="/login">Sign In</a>
@@ -42,6 +39,9 @@
                     {% if session["role"] == "Administrator" %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/admin/' %} active {% endif %}" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view">Users</a>
                     </li>
                     {% endif %}
                 </ul>

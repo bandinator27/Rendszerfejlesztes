@@ -26,7 +26,7 @@ class UserResponseSchema(Schema):
     token = fields.String()
 
 class UserLoginSchema(Schema):
-    email = String(required=True, validate=Email())
+    username = String(required=True)
     password = fields.String(required=True)
 
 class PayloadSchema(Schema):

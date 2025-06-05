@@ -9,6 +9,7 @@
                 {% set icon_type =
                 "check-circle" if category == "success"
                 else "info-circle" if category == "info"
+                else "dash-circle" if category == "warning"
             %}
         <div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-4">
             <i class="bi bi-{{ icon_type }} pe-2"></i>

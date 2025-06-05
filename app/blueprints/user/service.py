@@ -42,11 +42,11 @@ class UserService:
     @staticmethod
     def user_login(request):
         try:
-            user = db.session.execute(select(Users).filter(Users.email == request["email"])).scalar_one_or_none()
+            user = db.session.execute(select(Users).filter(Users.username == request["username"])).scalar_one_or_none()
             
             if user is None:
                 return False, {
-                    "message": "No user found with this email address",
+                    "message": "No user found with this username.",
                     "error_type": "auth_failed"
                 }
      
@@ -74,25 +74,32 @@ class UserService:
         except Exception as ex:
             return False, f"Database error! (user_view) Details: {ex}"
         return True, UserResponseSchema().dump(user, many=True)
-    
-    @staticmethod
-    def token_generate(user: Users):
-        payload = PayloadSchema()
-        payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
-        payload.user_id = user.id
-        payload.roles = RoleSchema().dump(user.roles, many=True)
-        return jwt.encode({'alg': 'RS256'},
-                          PayloadSchema().dump(payload),
-                          current_app.config['SECRET_KEY']).decode()
 
-        # # Get all roles for current user as a list of strings
-        # roles = db.session.execute(select(Roles.role_name).filter(Roles.id == user.id)).scalars().all()
-        # if not roles:
-        #     payload.roles = ["None"]
-        # else:
-        #     payload.roles = list(roles)
-        # return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload),
-        #                   current_app.config['SECRET_KEY']).decode()
+# --- Token generation
+    @staticmethod
+    # def token_generate(user: Users):
+    #     payload_data = {
+    #         'sub': user.id,
+    #         'username': user.username,
+    #         'iat': int(datetime.now().timestamp()),
+    #         'exp': int((datetime.now() + timedelta(minutes=30)).timestamp()),
+    #         'roles': RoleSchema().dump(obj=user.roles, many=True)
+    #     }
+    #     encoded_jwt = jwt.encode(
+    #         payload_data,
+    #         current_app.config['SECRET_KEY'],
+    #         algorithm='RS256'
+    #     )
+    #     print(f"DEBUG: Generated JWT for user {user.username}: {encoded_jwt}")
+    #     return encoded_jwt
+
+    def token_generate(user : Users):
+        payload = PayloadSchema()
+        payload.exp = int((datetime.now()+ timedelta(minutes=30)).timestamp())
+        payload.user_id = user.id
+        payload.roles = RoleSchema().dump(obj=user.roles, many=True)
+        
+        return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
 
     @staticmethod
     def get_user_data(user_id):

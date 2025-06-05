@@ -51,16 +51,51 @@ def set_car_data(cid, json_data):
     raise HTTPError(message=response, status_code=400)
 
 # --- Add a new car
-@car_bp.post('/add')
+@car_bp.post('/api/add')
 @car_bp.doc(tags=["car"])
 @car_bp.input(CarsSchema, location="json")
-#@car_bp.auth_required(auth)
+@car_bp.auth_required(auth)
 @role_required(["Administrator"])
 def add_car(json_data):
     success, response = CarsService.add_car(json_data)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
+
+from flask import request, render_template, redirect, url_for, flash, current_app
+from authlib.jose import jwt
+
+@car_bp.route('/add', methods=["POST"])
+def add_car_form():
+    form_data = request.form.to_dict()
+
+    print(f"DEBUG: add_car_form")
+    token = request.cookies.get('access_token')
+    print(f"DEBUG: Token: {token}")
+    if not token:
+        flash("Unauthorized: No token found!", "danger")
+        return redirect(url_for('main.login'))
+
+    try:
+        public_key = current_app.config['PUBLIC_KEY']
+        claims = jwt.decode(token, public_key)
+        claims.validate()
+    except Exception as e:
+        flash("Unauthorized: Invalid token!", "danger")
+        return redirect(url_for('main.login'))
+
+    user_roles = [r['role_name'] for r in claims.get('roles', [])]
+    if "Administrator" not in user_roles:
+        flash("Warning: You don't have access to add a car!", "warning")
+        return redirect(url_for('main.home'))
+
+    success, response = CarsService.add_car(form_data)
+    if success:
+        flash("Car added successfully!", "success")
+        return redirect(url_for('main.home'))
+
+    flash("Failed to add car", "danger")
+    return render_template("add_car.html")
 
 # --- Delete a car
 @car_bp.delete('/remove/<int:cid>')

@@ -33,7 +33,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form class="row" id="addCarForm" action="{{ url_for('main.car.add_car') }}" method="post">
+                <form class="row" id="addCarForm" action="{{ url_for('main.car.add_car_form') }}" method="post">
                     {% set text_fields = [
                         ('manufacturer', 'Manufacturer'),
                         ('model', 'Model'),
@@ -58,7 +58,7 @@
                     {% for id, label in text_fields %}
                     <div class="col-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="{{ label }}" required>
+                            <input type="text" value="value" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="{{ label }}" required>
                             <label for="{{ id }}">{{ label }}</label>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                     {% for id, label in number_fields %}
                     <div class="col-3">
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="{{ label }}" required>
+                            <input type="number" value="2" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="{{ label }}" required>
                             <label for="{{ id }}">{{ label }}</label>
                         </div>
                     </div>

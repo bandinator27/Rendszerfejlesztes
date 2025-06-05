@@ -9,5 +9,12 @@ class Config:
         key_path = os.path.join(path, "secrets", "private-key.pem")
         with open(key_path, 'r') as f:
             return f.read()
+
+    def load_public_key():
+        path = os.path.abspath(os.path.dirname(__file__))
+        key_path = os.path.join(path, "secrets", "public-key.pem")
+        with open(key_path, 'r') as f:
+            return f.read()
     
     SECRET_KEY = load_private_key()
+    PUBLIC_KEY = load_public_key()

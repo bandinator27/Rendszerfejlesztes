@@ -25,28 +25,74 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         user = db.session.query(Users).filter_by(username=username).first()
+
         if user and check_password_hash(user.password, password):
             session['user'] = user.username
 
-            # if the user has multiple roles, determine the primary role based on the hierarchy
-            # the higher the role id, the more important it is
+            # Determine primary role
             all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
             role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
-            
             user_role_names = [role.role_name for role in user.roles]
 
-            primary_role = None
-            for role_in_hierarchy in role_hierarchy:
-                if role_in_hierarchy in user_role_names:
-                    primary_role = role_in_hierarchy
-                    break
+            primary_role = next((r for r in role_hierarchy if r in user_role_names), None)
             session['role'] = primary_role
+
+            from authlib.jose import jwt
+            from datetime import datetime, timedelta
+            from flask import make_response, current_app
+            from app.blueprints.user.schemas import PayloadSchema, RoleSchema
+
+            payload = PayloadSchema()
+            payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
+            payload.user_id = user.id
+            payload.roles = RoleSchema().dump(obj=user.roles, many=True)
+
+            header = {'alg': 'RS256'}
+            claims = PayloadSchema().dump(payload)
+            private_key = current_app.config['SECRET_KEY']
+
+            token = jwt.encode(header, claims, private_key).decode('utf-8')
+
+            resp = make_response(redirect(url_for('main.home')))
+            resp.set_cookie('access_token', token, httponly=True, secure=False, samesite='Lax')
+            
             flash("You're signed in!", "info")
-            return redirect(url_for('main.home'))
+            return resp
+
         else:
             flash("Incorrect sign-in details!", "danger")
             return render_template('login.html', register=url_for('main.register'))
-    return render_template('login.html', register = url_for('main.register'))
+
+    return render_template('login.html', register=url_for('main.register'))
+
+
+# def login():
+#     if request.method == 'POST':
+#         username = request.form.get('username')
+#         password = request.form.get('password')
+#         user = db.session.query(Users).filter_by(username=username).first()
+#         if user and check_password_hash(user.password, password):
+#             session['user'] = user.username
+
+#             # if the user has multiple roles, determine the primary role based on the hierarchy
+#             # the higher the role id, the more important it is
+#             all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
+#             role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
+            
+#             user_role_names = [role.role_name for role in user.roles]
+
+#             primary_role = None
+#             for role_in_hierarchy in role_hierarchy:
+#                 if role_in_hierarchy in user_role_names:
+#                     primary_role = role_in_hierarchy
+#                     break
+#             session['role'] = primary_role
+#             flash("You're signed in!", "info")
+#             return redirect(url_for('main.home'))
+#         else:
+#             flash("Incorrect sign-in details!", "danger")
+#             return render_template('login.html', register=url_for('main.register'))
+#     return render_template('login.html', register = url_for('main.register'))
 
 # --- Registration
 @main_bp.route("/register/", methods=['GET', 'POST'])
