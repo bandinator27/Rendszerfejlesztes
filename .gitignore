@@ -5,7 +5,6 @@
 *.pyc
 .env
 env/
-.venv
 
 # Flask stuff:
 instance/
