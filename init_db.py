@@ -30,7 +30,7 @@ db.session.add_all([
 # --- USERS test data
 db.session.add_all([
         Users(
-            username="TesztBela",
+            username="bela",
             password=generate_password_hash("teszt123"),
             password_salt="salty",
             address_id=1,
@@ -38,7 +38,7 @@ db.session.add_all([
             phone_number="+3670123456",
         ),
         Users(
-            username="TesztJani",
+            username="jani",
             password=generate_password_hash("teszt123"),
             password_salt="salty",
             address_id=2,

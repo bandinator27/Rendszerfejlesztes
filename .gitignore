@@ -3,9 +3,13 @@
 *.py[cod]
 *$py.class
 *.pyc
-.env
+.ssh/
+
+# Environments
+.venv/
+venv/
+.env/
 env/
 
-# Flask stuff:
+# Flask
 instance/
-.webassets-cache
