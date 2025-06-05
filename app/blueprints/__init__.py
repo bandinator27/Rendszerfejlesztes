@@ -1,6 +1,6 @@
 ﻿from apiflask import APIBlueprint
 from app.extensions import auth
-from flask import current_app
+from flask import current_app, request
 from authlib.jose import jwt
 from datetime import datetime
 from apiflask import HTTPError, HTTPTokenAuth
@@ -13,25 +13,25 @@ auth = HTTPTokenAuth(scheme='Bearer')
 
 @auth.verify_token
 def verify_token(token):
-    try:
-        data = jwt.decode(
-            token.encode('ascii'),
-            current_app.config['SECRET_KEY'])
-        user_id = data.get("sub")
-        if user_id:
-            user = Users.query.get(user_id)
-            if user:
-                return user
+    if not token:
+        token = request.cookies.get('access_token')
+        print("DEBUG: Retrieved token from cookie.")
+
+    if not token:
+        print("DEBUG: No token found in header or cookie.")
         return None
 
-    except jwt.ExpiredSignatureError:
-        print("Token has expired.")
+    try:
+        print(f"DEBUG: Verifying token: {token}")
+        data = jwt.decode(token.encode('ascii'), current_app.config['SECRET_KEY'])
+        user_id = data.get("user_id")
+        print(f"DEBUG: Token user_id: {user_id}")
+        if user_id:
+            return Users.query.get(user_id)
         return None
-    except jwt.InvalidTokenError as e:
-        print(f"Invalid token: {e}")
-        return None
+
     except Exception as e:
-        print(f"An error occurred during token verification: {e}")
+        print(f"DEBUG: Token error: {e}")
         return None
 
 # @auth.verify_token

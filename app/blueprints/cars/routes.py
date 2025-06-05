@@ -68,21 +68,17 @@ from authlib.jose import jwt
 @car_bp.route('/add', methods=["POST"])
 def add_car_form():
     form_data = request.form.to_dict()
-
-    print(f"DEBUG: add_car_form")
     token = request.cookies.get('access_token')
-    print(f"DEBUG: Token: {token}")
     if not token:
-        flash("Unauthorized: No token found!", "danger")
+        flash("Unauthorized: No token!", "danger")
         return redirect(url_for('main.login'))
-
     try:
         public_key = current_app.config['PUBLIC_KEY']
         claims = jwt.decode(token, public_key)
         claims.validate()
-    except Exception as e:
-        flash("Unauthorized: Invalid token!", "danger")
-        return redirect(url_for('main.login'))
+    except Exception as ex:
+        flash("Unauthorized: invalid token. Sign in again!", "danger")
+        return redirect(url_for('main.logout'))
 
     user_roles = [r['role_name'] for r in claims.get('roles', [])]
     if "Administrator" not in user_roles:
@@ -92,7 +88,7 @@ def add_car_form():
     success, response = CarsService.add_car(form_data)
     if success:
         flash("Car added successfully!", "success")
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.admin_page'))
 
     flash("Failed to add car", "danger")
     return render_template("add_car.html")

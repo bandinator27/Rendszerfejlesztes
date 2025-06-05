@@ -5,12 +5,13 @@
     <div class="row pt-4">
         {% with messages = get_flashed_messages(with_categories = True) %}
         {% if messages %}
-            {% for category, msg in messages %}
-                {% set icon_type =
-                "check-circle" if category == "success"
-                else "info-circle" if category == "info"
-                else "dash-circle" if category == "warning"
-            %}
+        {% for category, msg in messages %}
+        {% set icon_type =
+        "check-circle" if category == "success"
+        else "info-circle" if category == "info"
+        else "exclamation-circle" if category == "warning"
+        else "exclamation-triangle" if category == "danger"
+        %}
         <div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-4">
             <i class="bi bi-{{ icon_type }} pe-2"></i>
             <div>
@@ -29,4 +30,4 @@
         {% endif %}
     </div>
 </div>
-    {% endblock %}
+{% endblock %}

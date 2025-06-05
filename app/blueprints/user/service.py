@@ -77,30 +77,15 @@ class UserService:
 
 # --- Token generation
     @staticmethod
-    # def token_generate(user: Users):
-    #     payload_data = {
-    #         'sub': user.id,
-    #         'username': user.username,
-    #         'iat': int(datetime.now().timestamp()),
-    #         'exp': int((datetime.now() + timedelta(minutes=30)).timestamp()),
-    #         'roles': RoleSchema().dump(obj=user.roles, many=True)
-    #     }
-    #     encoded_jwt = jwt.encode(
-    #         payload_data,
-    #         current_app.config['SECRET_KEY'],
-    #         algorithm='RS256'
-    #     )
-    #     print(f"DEBUG: Generated JWT for user {user.username}: {encoded_jwt}")
-    #     return encoded_jwt
-
     def token_generate(user : Users):
+        print(f"DEBUG: Generating token for user {user.username}")
         payload = PayloadSchema()
-        payload.exp = int((datetime.now()+ timedelta(minutes=30)).timestamp())
         payload.user_id = user.id
         payload.roles = RoleSchema().dump(obj=user.roles, many=True)
+        payload.exp = int((datetime.now()+ timedelta(minutes=30)).timestamp())
         
         return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
-
+   
     @staticmethod
     def get_user_data(user_id):
         user = db.session.execute(select(Users).filter(Users.email == user_id)).scalar_one_or_none()

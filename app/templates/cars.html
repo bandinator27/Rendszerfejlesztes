@@ -1,13 +1,26 @@
 ﻿{% extends "base.html" %}
 {% block title %} All cars {% endblock %}
 {% block content %}
-	{% with messages = get_flashed_messages() %}
-		{% if messages %}
-			{% for msg in messages %}
-<p>{{msg}}</p>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
+	{% with messages = get_flashed_messages(with_categories = True) %}
+        {% if messages %}
+	        {% for category, msg in messages %}
+	        {% set icon_type =
+	        "check-circle" if category == "success"
+            else "exclamation-circle" if category == "warning"
+	        else "exclamation-triangle" if category == "danger"
+	        %}
+            <div class="row justify-content-center text-center mt-4">
+                <div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-3">
+                    <i class="bi bi-{{ icon_type }} pe-2"></i>
+                    <div>
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            </div>
+	        {% endfor %}
+        {% endif %}
+    {% endwith %}
 
 <div class="row justify-content-center">
     <div class="col-lg-3 col-sm-8 my-4">
@@ -18,27 +31,27 @@
             </div>
         </form>
     </div>
+    {#
     <div class="col-auto my-4">
         <a href="/car/view_cars" class="btn btn-outline-info" target="_blank">All cars (JSON)</a>
     </div>
+    #}
 </div>
 
 <div class="table-responsive row justify-content-center">
     <table class="table table-striped table-bordered table-hover mb-4 w-auto">
+        {% if session.get("user") %}
         <thead>
             <tr>
-                <th>ID</th>{% for item in values %}
-                <th>{{ item.carid }}</th>{% endfor %}
+                <th>#</th>{% for item in values %}
+                <td><button type="button" class="btn btn-secondary btn-sm rent-btn" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button></td>{% endfor %}
             </tr>
         </thead>
+        {% endif %}
         <tbody>
             <tr>
                 <th>Numberplate</th>{% for item in values %}
                 <td>{{ item.numberplate }}</td>{% endfor %}
-            </tr>
-            <tr>
-                <th>Rentable</th>{% for item in values %}
-                <td>{{ item.rentable }}</td>{% endfor %}
             </tr>
             <tr>
                 <th>Price</th>{% for item in values %}
@@ -103,5 +116,43 @@
         </tbody>
     </table>
 </div>
+
+<div class="modal fade" id="rentModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rentModalLabel">Rental details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="rentForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" id="carid" name="carid">
+                    <div class="mb-3">
+                        <label for="rentstart" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="rentstart" name="rentstart" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rentduration" class="form-label">Rental Duration (days)</label>
+                        <input type="number" min="1" class="form-control" id="rentduration" name="rentduration" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Send request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rentForm = document.getElementById('rentForm');
+    document.querySelectorAll('.rent-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const carid = this.dataset.carid;
+            document.getElementById('carid').value = carid;
+            rentForm.action = `/rental/rent/${carid}`;
+        });
+    });
+</script>
 
 {% endblock %}

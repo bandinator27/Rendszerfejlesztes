@@ -15,7 +15,6 @@ class RentalsSchema(Schema):
 class RentalRequestSchema(Schema):
     rentstart = String(required=True)
     rentduration = Integer(required=True)
-    rentprice = Integer(required=True)
 
     class Meta:
         unknown = EXCLUDE

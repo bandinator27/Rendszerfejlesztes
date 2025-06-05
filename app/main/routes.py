@@ -33,7 +33,6 @@ def login():
             all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
             role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
             user_role_names = [role.role_name for role in user.roles]
-
             primary_role = next((r for r in role_hierarchy if r in user_role_names), None)
             session['role'] = primary_role
 
@@ -43,14 +42,13 @@ def login():
             from app.blueprints.user.schemas import PayloadSchema, RoleSchema
 
             payload = PayloadSchema()
-            payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
             payload.user_id = user.id
             payload.roles = RoleSchema().dump(obj=user.roles, many=True)
+            payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
 
             header = {'alg': 'RS256'}
             claims = PayloadSchema().dump(payload)
             private_key = current_app.config['SECRET_KEY']
-
             token = jwt.encode(header, claims, private_key).decode('utf-8')
 
             resp = make_response(redirect(url_for('main.home')))

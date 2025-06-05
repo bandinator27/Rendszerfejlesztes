@@ -18,36 +18,36 @@ class RentalsService:
     @staticmethod
     def rent_car(carid, request):
         try:
+            # Date should already be a datetime object from the route
+            if not isinstance(request["rentstart"], datetime):
+                return False, "Invalid date format received by service"
+
             # Validate required fields
-            required_fields = [
-                "carid",
-                "renterid",
-                "rentstart",
-                "rentduration",
-                "rentprice",
-            ]
+            required_fields = ["carid", "renterid", "rentstart", "rentduration", "rentprice"]
             for field in required_fields:
                 if field not in request:
                     return False, f"Missing required field: {field}"
+
+            # Make sure rentduration is an integer
             try:
-                request["rentstart"] = datetime.strptime(request["rentstart"], "%Y-%m-%d")
-            except ValueError:
-                return False, "Invalid date format. Use YYYY-MM-DD (Optional: HH:MM:SS)"
+                request["rentduration"] = int(request["rentduration"])
+            except (ValueError, TypeError):
+                return False, "Rental duration must be a number"
 
             # Check if current user already has a rental for this car
-            existing_rental = db.session.get(Rentals, (carid, request["renterid"]))
-            if existing_rental:
-                return False, f"You already have a rental for Car #{carid}."
+            # existing_rental = db.session.get(Rentals, (carid, request["renterid"]))
+            # if existing_rental:
+            #     return False, f"You already have a rental for Car #{carid}."
 
             # Check if car is already rented/pending
-            active_rental = db.session.execute(
-                select(Rentals).filter(
-                    Rentals.carid == carid,
-                    Rentals.rentstatus.in_(["Rented", "Pending"]),
-                )).scalar_one_or_none()
+            # active_rental = db.session.execute(
+            #     select(Rentals).filter(
+            #         Rentals.carid == carid,
+            #         Rentals.rentstatus.in_(["Rented", "Pending"]),
+            #     )).scalar_one_or_none()
 
-            if active_rental:
-                return False, f"Car #{carid} is currently unavailable."
+            # if active_rental:
+            #     return False, f"Car #{carid} is currently unavailable."
 
             # Set the car to rentable=0
             car = db.session.get(Cars, carid)

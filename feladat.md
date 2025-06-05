@@ -8,7 +8,7 @@ User:
 Clerk:
 - [x] Approve rentals
 - [x] Accept car returns
-- [x] View all rentals
+- [ ] View all rentals
 - [x] Set cars' rent status
 - [ ] Create invoices
 

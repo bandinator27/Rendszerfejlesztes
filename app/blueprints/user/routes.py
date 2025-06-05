@@ -1,7 +1,7 @@
 ﻿from app.blueprints import role_required
 from app.blueprints.user import user_bp
 from app.blueprints.user.schemas import UserRequestSchema, UserResponseSchema
-from app.blueprints.user.schemas import UserLoginSchema
+# from app.blueprints.user.schemas import UserLoginSchema
 from app.blueprints.user.schemas import RoleSchema
 from apiflask import HTTPError
 from app.blueprints.user.service import UserService
@@ -11,15 +11,15 @@ from app.extensions import auth
 # def index():
 #     return 'This is the users Blueprint'
 
-# --- LOGIN
-@user_bp.post('/login')
-@user_bp.doc(tags=["user"])
-@user_bp.input(UserLoginSchema, location="form")
-def user_login(form_data):
-    success, response = UserService.user_login(form_data)
-    if success:
-        return response, 200
-    return response, 401
+# --- LOGIN (redirected to main.login)
+# @user_bp.post('/login')
+# @user_bp.doc(tags=["user"])
+# @user_bp.input(UserLoginSchema, location="form")
+# def user_login(form_data):
+#     success, response = UserService.user_login(form_data)
+#     if success:
+#         return response, 200
+#     return response, 401
 
 # --- REGISTER
 @user_bp.post('/register')
