@@ -1,20 +1,19 @@
-# Rendszerfejlesztés
-## Bérautó
+# Advanced methods of system development
+## Car rental
 
-Virtuális környezet indítás projektkönyvtárban:
+Create & activate a virtual environment then install dependencies:
 ```
 python -m venv venv  
-(Windows) .\env\Scripts\activate
-(Linux) source env/bin/activate
+(Windows) .\.venv\Scripts\activate
+(Linux) source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Migrációs parancsok (erre csak akkor van szükség ha nincs `migration` mappa):
+Migration commands (if there's no `migration` folder already):
 ```
-flask db init   
-flask db upgrade  
-flask db migrate -m "TÁBLA_NEVE table"
+flask db init
+flask db migrate -m "your comment"
+flask db upgrade
 ```
 
-Ha aktív a virtuális környezet akkor lehet indítani a webszervert:
-`flask run` vagy `python run_app.py`
+With an active virtual environment you can start the webserver: `flask run` or `python run_app.py`
