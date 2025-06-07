@@ -134,31 +134,31 @@ db.session.add_all([
         Rentals(
             carid=1,
             renterid=1,
-            rentstart=datetime.strptime("2025-06-07", "%Y-%m-%d"),
+            rentstart=datetime.strptime("2025-06-10", "%Y-%m-%d"),
             rentstatus="Rented",
-            rentduration=1,
+            rentduration=3,
             rentprice=500,
-            renteraddress="Veszprém, Privát utca 1",
+            renteraddress="Veszprém, Privát utca 1.",
             renterphonenum="+36201234567"
         ),
         Rentals(
             carid=2,
             renterid=3,
-            rentstart=datetime.strptime("2025-06-07", "%Y-%m-%d"),
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
             rentstatus="Rented",
-            rentduration=1,
+            rentduration=5,
             rentprice=500,
-            renteraddress="Veszprém, Privát utca 1",
+            renteraddress="Balatonlelle, Kossuth utca 12.",
             renterphonenum="+36201234567"
         ),
         Rentals(
             carid=3,
             renterid=2,
-            rentstart=datetime.strptime("2025-05-18", "%Y-%m-%d"),
+            rentstart=datetime.strptime("2025-05-30", "%Y-%m-%d"),
             rentstatus="Pending",
             rentduration=15,
             rentprice=1500,
-            renteraddress="Veszprém, Privát utca 2",
+            renteraddress="Budapest, József A. utca 6.",
             renterphonenum="+36701234568"
         )])
 
