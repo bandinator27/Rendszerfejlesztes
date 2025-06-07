@@ -15,10 +15,10 @@ from flask import redirect, url_for
 # --- LOGIN (redirected to main.login)
 @user_bp.post('/login')
 @user_bp.doc(tags=["user"])
-@user_bp.input(UserLoginSchema, location="form")
-def user_login(form_data):
-     print(form_data)
-     success, response = UserService.user_login(form_data)
+@user_bp.input(UserLoginSchema, location="json")
+def user_login(json_data):
+     print(json_data)
+     success, response = UserService.user_login(json_data)
      if success:
          return response, 200
      raise HTTPError(message=response, status_code=400)

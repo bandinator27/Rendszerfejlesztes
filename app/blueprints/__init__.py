@@ -31,6 +31,12 @@ main_bp = APIBlueprint('main', __name__, tag="main")
 #        print(f"DEBUG: Token error: {e}")
 #        return None
 
+def set_auth_headers(token):
+    return {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+
 @auth.verify_token
 def verify_token(token):
      try:
@@ -48,10 +54,10 @@ def role_required(roles):
     def wrapper(fn):
         @wraps(fn)
         def decorated_function(*args, **kwargs):
-            #user_roles = [item["name"] for item in auth.current_user.get("roles")]
+            user_roles = [item["name"] for item in auth.current_user.get("roles")]
             for role in roles:
-                #if role in user_roles:
-                return fn(*args, **kwargs)        
+                if role in user_roles:
+                    return fn(*args, **kwargs)        
             raise HTTPError(message="Access denied! (role_required)", status_code=403)
         return decorated_function
     return wrapper

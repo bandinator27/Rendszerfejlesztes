@@ -8,6 +8,10 @@ from app.models.roles import *
 from app.models.users import *
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy import select
+from app.forms.loginform import LoginForm
+
+import requests
+from app.blueprints import verify_token, set_auth_headers
 
 @main_bp.route("/")
 def home():
@@ -19,7 +23,30 @@ def home():
 
 @main_bp.route("/login/", methods=['POST', 'GET'])
 def login():
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash("Login requested for user {}".format(form.username.data))
+
+        #token = request.cookies.get('access_token')
+        #data = verify_token(token)
+        #if not data:
+        #    return redirect(url_for("main.home"))
+           
+        login_request = requests.post('http://localhost:5000/user/login',
+                        json={
+                            'username': form.username.data,
+                            'password': form.password.data
+                        })
+        
+        print(login_request.json())
+        flash(f"Logging in.")
+        return redirect("/")
+
+    return render_template('login.html', name='Pythonblog', form=form)
+
     if request.method == 'POST':
+
         username = request.form.get('username')
         password = request.form.get('password')
 
@@ -241,14 +268,20 @@ def account():
            return redirect(url_for("main.home"))
    else:
        return redirect(url_for("main.home"))
-   
+
 @main_bp.route("/rentals/")
 def rentals():
    if "user" in session:
        user = session["user"]
        found_user = db.session.query(Users).filter_by(username=user).first()
        if found_user:
-           return render_template('rentals.html', userAccount=found_user)
+           token = request.cookies.get('access_token')
+           data = verify_token(token)
+           if not data:
+               return redirect(url_for("main.home"))
+           
+           rentals_list = requests.get('http://localhost:5000/rental/view_rentals_user', headers=set_auth_headers(token))
+           return render_template('rentals2.html', userAccount=found_user, rentals_list=rentals_list.json())
        else:
            return redirect(url_for("main.home"))
    else:

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}View all users{% endblock %}
+{% block content %}
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for msg in messages %}
+<p>{{msg}}</p>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+
+<div class="row pt-4 justify-content-center">
+    <p class="text-center fs-3 pb-4">Current rentals</p>
+    <table class="table table-striped table-hover w-auto">
+        <thead>
+            <tr>
+                <th>Numberplate</th>
+                <th>Rent duration (days)</th>
+                <th>Address</th>
+                <th>Phone number</th>
+                <th>Price / day</th>
+                <th>Start date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="main">
+            {% for car in rentals_list %}
+            <tr>
+                <td>{{car.carid}}</td>
+                <td>{{car.rentduration}}</td>
+                <td>{{car.renteraddress}}</td>
+                <td>{{car.renterphonenum}}</td>
+                <td>{{car.rentprice}}</td>
+                <td>{{car.rentstart}}</td>
+                <td>{{car.rentstatus}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
