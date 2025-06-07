@@ -177,37 +177,81 @@ def register():
 def view():
    return render_template('view.html', values=db.session.query(Users).all())
 
-# --- List cars for testing
+# --- List cars
 @main_bp.route('/cars', methods=['GET'], strict_slashes=False)
 def cars():
     cid = request.args.get('cid', type=str)
     filter_type = request.args.get('type', type=str)
 
-    #if cid:
-    #    cars = Cars.query.filter_by(carid=cid).all()
-    #else:
-    #    cars = Cars.query.all()
+    query = Cars.query
 
-    if filter_type == "Numberplate":
-        cars = Cars.query.filter_by(numberplate=cid).all()
-    elif filter_type == "Manufacturer":
-        cars = Cars.query.filter_by(manufacturer=cid).all()
-    elif filter_type == "Model":
-        cars = Cars.query.filter_by(model=cid).all()
-    elif filter_type == "Color":
-        cars = Cars.query.filter_by(color=cid).all()
-    elif filter_type == "Price (Maximum)":
-        cars = db.session.execute(select(Cars).filter(Cars.price <= cid)).scalars().all()
-    elif filter_type == "Price (Minimum)":
-        cars = db.session.execute(select(Cars).filter(Cars.price >= cid)).scalars().all()
-    elif filter_type == "Mileage (Maximum)":
-        cars = db.session.execute(select(Cars).filter(Cars.kmcount <= cid)).scalars().all()
-    elif filter_type == "Mileage (Minimum)":
-        cars = db.session.execute(select(Cars).filter(Cars.kmcount >= cid)).scalars().all()
-    else:
+    if cid and filter_type:
+        if filter_type == "Numberplate":
+            query = query.filter(Cars.numberplate.ilike(f'%{cid}%'))
+        elif filter_type == "Manufacturer":
+            query = query.filter(Cars.manufacturer.ilike(f'%{cid}%'))
+        elif filter_type == "Model":
+            query = query.filter(Cars.model.ilike(f'%{cid}%'))
+        elif filter_type == "Color":
+            query = query.filter(Cars.color.ilike(f'%{cid}%'))
+        elif filter_type == "Price (Maximum)":
+            try:
+                max_price = float(cid)
+                query = query.filter(Cars.price <= max_price)
+            except ValueError:
+                flash("Invalid price value. Please enter a number.", "warning")
+                query = Cars.query.all()
+        elif filter_type == "Price (Minimum)":
+            try:
+                min_price = float(cid)
+                query = query.filter(Cars.price >= min_price)
+            except ValueError:
+                flash("Invalid price value. Please enter a number.", "warning")
+                query = Cars.query.filter(False)
+        elif filter_type == "Mileage (Maximum)":
+            try:
+                max_km = int(cid)
+                query = query.filter(Cars.kmcount <= max_km)
+            except ValueError:
+                flash("Invalid mileage value. Please enter a whole number.", "warning")
+                query = Cars.query.filter(False)
+        elif filter_type == "Mileage (Minimum)":
+            try:
+                min_km = int(cid)
+                query = query.filter(Cars.kmcount >= min_km)
+            except ValueError:
+                flash("Invalid mileage value. Please enter a whole number.", "warning")
+                query = Cars.query.filter(False)
+        else:
+            pass
+
+    if not cid or not filter_type:
         cars = Cars.query.all()
+    else:
+        cars = query.all()
 
     return render_template('cars.html', values=cars)
+
+    # if filter_type == "Numberplate":
+    #     cars = Cars.query.filter_by(numberplate=cid).all()
+    # elif filter_type == "Manufacturer":
+    #     cars = Cars.query.filter_by(manufacturer=cid).all()
+    # elif filter_type == "Model":
+    #     cars = Cars.query.filter_by(model=cid).all()
+    # elif filter_type == "Color":
+    #     cars = Cars.query.filter_by(color=cid).all()
+    # elif filter_type == "Price (Maximum)":
+    #     cars = db.session.execute(select(Cars).filter(Cars.price <= cid)).scalars().all()
+    # elif filter_type == "Price (Minimum)":
+    #     cars = db.session.execute(select(Cars).filter(Cars.price >= cid)).scalars().all()
+    # elif filter_type == "Mileage (Maximum)":
+    #     cars = db.session.execute(select(Cars).filter(Cars.kmcount <= cid)).scalars().all()
+    # elif filter_type == "Mileage (Minimum)":
+    #     cars = db.session.execute(select(Cars).filter(Cars.kmcount >= cid)).scalars().all()
+    # else:
+    #     cars = Cars.query.all()
+
+    # return render_template('cars.html', values=cars)
 
 # --- Terminate session
 @main_bp.route("/logout/")

@@ -5,3 +5,7 @@ html {
 body {
     color: white;
 }
+
+.separator {
+    border-right: 1px solid #bbb;
+}

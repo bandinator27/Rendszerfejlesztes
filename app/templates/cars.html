@@ -9,15 +9,15 @@
             else "exclamation-circle" if category == "warning"
 	        else "exclamation-triangle" if category == "danger"
 	        %}
-            <div class="row justify-content-center text-center mt-4">
-                <div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-3">
-                    <i class="bi bi-{{ icon_type }} pe-2"></i>
-                    <div>
-                        {{ msg }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                </div>
-            </div>
+<div class="row justify-content-center text-center mt-4">
+    <div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-3">
+        <i class="bi bi-{{ icon_type }} pe-2"></i>
+        <div>
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+</div>
 	        {% endfor %}
         {% endif %}
     {% endwith %}
@@ -26,73 +26,61 @@
     <div class="col-lg-6 col-sm-6 my-6">
         <form action="{{ url_for('main.cars') }}" method="get">
             <div class="input-group">
-                <select class="form-control" name="type">
-                  <option>Numberplate</option>
-                  <option>Manufacturer</option>
-                  <option>Model</option>
-                  <option>Color</option>
-                  <option>Price (Maximum)</option>
-                  <option>Price (Minimum)</option>
-                  <option>Mileage (Maximum)</option>
-                  <option>Mileage (Minimum)</option>
+                <select class="form-select" name="type">
+                    <option>Numberplate</option>
+                    <option>Manufacturer</option>
+                    <option>Model</option>
+                    <option>Color</option>
+                    <option>Price (Maximum)</option>
+                    <option>Price (Minimum)</option>
+                    <option>Mileage (Maximum)</option>
+                    <option>Mileage (Minimum)</option>
                 </select>
                 <input type="text" name="cid" class="form-control" placeholder="filter by this value" required>
                 <button class="btn btn-outline-light" type="submit">Show</button>
-                <button class="btn btn-outline-light" type="button" onclick="window.location.href = '{{ url_for('main.cars') }}';">Reset</button>
+                <a href="{{ url_for('main.cars') }}" class="btn btn-outline-light">Reset</a>
             </div>
         </form>
     </div>
-    {#
-    <div class="col-auto my-4">
-        <a href="/car/view_cars" class="btn btn-outline-info" target="_blank">All cars (JSON)</a>
-    </div>
-    #}
 </div>
 
-{% set count = namespace(value=0) %}
-<div class="container text-center">
-{% for item in values %}
-{% set count.value = count.value+1 %}
-    {% if count.value % 4 == 1 %}
-        <div class="row mb-4">
-                <div class="card-group">
-                <div class="col-3">
-    {% else %}
-            <div class="col-3">
-    {% endif %}
-                <div class="card h-100 text-bg-light border-dark" style="width: 18rem;">
-                    {% set url = "/images/" + item.image_url %}
-                    <img src="{{ url_for('static', filename=url) }}" class="card-img-top" alt="default.png">
-                    <div class="card-body text-bg-light border-dark">
-                    <h5 class="card-title">{{ item.manufacturer }} {{ item.model }} - {{ item.year }}</h5>
-                    <p class="card-text">Numberplate - {{ item.numberplate }}</p>
-                    <p class="card-text">
-                        {{ item.color }} with {{ item.interior }} interior
-                    </p>
-                    <p class="card-text">
-                        Extras: {{ item.extras }}
-                    </p>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                    <li class="list-group-item text-bg-light border-dark">{{ item.seats }} seats | {{ item.doors }} doors</li>
-                    <li class="list-group-item text-bg-light border-dark">Top - {{ item.topspeed }} km/h | {{ item.power }} HP</li>
-                    <li class="list-group-item text-bg-light border-dark">Mileage: {{ item.kmcount }} km</li>
-                    <li class="list-group-item text-bg-light border-dark">Engine - {{ item.enginetype }} | Fuel - {{ item.fueltype }}</li>
-                    </ul>
-                    <div class="card-footer text-bg-light border-dark">
-                        <p><small>{{ item.price }}$ / day</small></p>
-                        <button type="button" class="btn btn-secondary btn-sm rent-btn" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button>
-                    </div>
+    {% for row_items in values|batch(4) %}
+<div class="row row-cols-1 row-cols-md-4 pb-4">
+    {% for item in row_items %}
+    <div class="col">
+        <div class="card h-100 text-bg-light border-dark">
+            {% set url = "/images/" + item.image_url %}
+            <img src="{{ url_for('static', filename=url) }}" class="card-img-top" alt="Car image">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.manufacturer }} {{ item.model }} - {{ item.year }}</h5>
+                <p class="card-text">{{ item.numberplate }}</p>
+                <p class="card-text">{{ item.color }} with {{ item.interior }} interior</p>
+                <p class="card-text">Extras: {{ item.extras }}</p>
+                <p class="card-text">Mileage: {{ item.kmcount | thousands_separator }} km</p>
+                <p class="card-text">{{ item.enginetype }}, {{ item.power }} HP {{ item.fueltype }} engine </p>
+            </div>
+            <div class="row text-center align-items-center g-0 pb-2">
+                <div class="col-md-4 separator">
+                    <i class="bi bi-person fs-4 d-block"></i>
+                    <p class="card-text mb-0">{{ item.seats }}</p>
                 </div>
-    {% if count.value % 4 == 0 %}
+                <div class="col-md-4 separator">
+                    <i class="bi bi-speedometer2 fs-4 d-block"></i>
+                    <p class="card-text mb-0">{{ item.topspeed }} km/h</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="bi bi-cash fs-4 d-block"></i>
+                    <p class="card-text mb-0">${{ item.price }}/day</p>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button>
             </div>
         </div>
     </div>
-    {% else %}
-        </div>
-    {% endif %}
-  {% endfor %}
+    {% endfor %}
 </div>
+    {% endfor %}
 
 <div class="modal fade" id="rentModal" tabindex="-1">
     <div class="modal-dialog modal-sm">

@@ -1,11 +1,10 @@
 ﻿from apiflask import APIBlueprint
 from app.extensions import auth
-from flask import current_app, request
+from flask import current_app
 from authlib.jose import jwt
 from datetime import datetime
-from apiflask import HTTPError, HTTPTokenAuth
+from apiflask import HTTPError
 from functools import wraps
-from app.models.users import Users
 
 main_bp = APIBlueprint('main', __name__, tag="main")
 

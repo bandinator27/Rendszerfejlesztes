@@ -18,3 +18,7 @@ class Config:
     
     SECRET_KEY = load_private_key()
     PUBLIC_KEY = load_public_key()
+
+    UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'app', 'static', 'images')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    MAX_CONTENT_LENGTH = 8 * 1024 * 1024

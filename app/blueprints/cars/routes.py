@@ -65,9 +65,14 @@ def add_car(json_data):
 from flask import request, render_template, redirect, url_for, flash, current_app
 from authlib.jose import jwt
 
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
 @car_bp.route('/add', methods=["POST"])
 def add_car_form():
     form_data = request.form.to_dict()
+    form_data['rentable'] = 1
     token = request.cookies.get('access_token')
     if not token:
         flash("Unauthorized: No token!", "danger")
@@ -84,14 +89,38 @@ def add_car_form():
     if "Administrator" not in user_roles:
         flash("Warning: You don't have access to add a car!", "warning")
         return redirect(url_for('main.home'))
+    
+    file = request.files['car_image']
+    if file.filename == '':
+        flash("Select an image!", "warning")
+        return render_template("main.admin_page")
+
+    import os, uuid
+    from werkzeug.utils import secure_filename
+    # Validate the file type and save it
+    if file and allowed_file(file.filename):
+        original_filename = secure_filename(file.filename)
+        file_extension = original_filename.rsplit('.', 1)[1].lower()
+        unique_filename = str(uuid.uuid4().hex) + '.' + file_extension
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
+        try:
+            file.save(filepath)
+            form_data['image_url'] = unique_filename
+        except Exception as e:
+            flash(f"Error saving image: {e}", "danger")
+            current_app.logger.error(f"Failed to save image {unique_filename}: {e}")
+            return render_template("main.admin_page")
+    else:
+        flash("Invalid image file type. Only PNG, JPG, JPEG, GIF are allowed.", "danger")
+        return render_template("main.admin_page")
 
     success, response = CarsService.add_car(form_data)
     if success:
         flash("Car added successfully!", "success")
-        return redirect(url_for('main.admin_page'))
-
+        return redirect(url_for('main.admin'))
+    
     flash("Failed to add car", "danger")
-    return render_template("add_car.html")
+    return render_template("main.admin")
 
 # --- Delete a car
 @car_bp.delete('/remove/<int:cid>')

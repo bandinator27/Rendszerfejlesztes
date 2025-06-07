@@ -7,6 +7,7 @@ class CarsSchema(Schema):
     price = fields.Integer()
     manufacturer = fields.String()
     model = fields.String()
+    year = fields.Integer()
     color = fields.String()
     seats = fields.Integer()
     interior = fields.String()
