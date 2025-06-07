@@ -1,14 +1,13 @@
-from flask import redirect, url_for, render_template, request, session, flash
+from flask import redirect, url_for, render_template, request, session, flash, make_response
 from app.extensions import db
 from app.models.addresses import Addresses
-from app.blueprints import main_bp, user_bp
+from app.blueprints import main_bp
 from app.models.cars import *
 from app.models.rentals import *
 from app.models.roles import *
 from app.models.users import *
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy import select
-from werkzeug.security import generate_password_hash
 
 @main_bp.route("/")
 def home():
@@ -64,51 +63,6 @@ def login():
     return render_template('login.html', register=url_for('main.register'))
 
 # --- Login
-#@main_bp.route("/login/", methods=['GET', 'POST'])
-#def login():
-#    if request.method == 'POST':
-#        username = request.form.get('username')
-#        password = request.form.get('password')
-#        user = db.session.query(Users).filter_by(username=username).first()
-#
-#        if user and check_password_hash(user.password, password):
-#            session['user'] = user.username
-#
-#            # Determine primary role
-#            all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
-#            role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
-#            user_role_names = [role.role_name for role in user.roles]
-#            primary_role = next((r for r in role_hierarchy if r in user_role_names), None)
-#            session['role'] = primary_role
-#
-#            from authlib.jose import jwt
-#            from datetime import datetime, timedelta
-#            from flask import make_response, current_app
-#            from app.blueprints.user.schemas import PayloadSchema, RoleSchema
-#
-#            payload = PayloadSchema()
-#            payload.user_id = user.id
-#            payload.roles = RoleSchema().dump(obj=user.roles, many=True)
-#            payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
-#
-#            header = {'alg': 'RS256'}
-#            claims = PayloadSchema().dump(payload)
-#            private_key = current_app.config['SECRET_KEY']
-#            token = jwt.encode(header, claims, private_key).decode('utf-8')
-#
-#            resp = make_response(redirect(url_for('main.home')))
-#            resp.set_cookie('access_token', token, httponly=True, secure=False, samesite='Lax')
-#            
-#            flash("You're signed in!", "info")
-#            return resp
-#
-#        else:
-#            flash("Incorrect sign-in details!", "danger")
-#            return render_template('login.html', register=url_for('main.register'))
-#
-#    return render_template('login.html', register=url_for('main.register'))
-
-
 # def login():
 #     if request.method == 'POST':
 #         username = request.form.get('username')
@@ -178,6 +132,8 @@ def view():
    return render_template('view.html', values=db.session.query(Users).all())
 
 # --- List cars
+from flask import current_app
+from authlib.jose import jwt
 @main_bp.route('/cars', methods=['GET'], strict_slashes=False)
 def cars():
     cid = request.args.get('cid', type=str)
@@ -226,41 +182,40 @@ def cars():
             pass
 
     if not cid or not filter_type:
-        cars = Cars.query.all()
+        cars_list = Cars.query.all()
     else:
-        cars = query.all()
+        cars_list = query.all()
 
-    return render_template('cars.html', values=cars)
+    is_admin = False
+    token = request.cookies.get('access_token')
+    if token:
+        try:
+            public_key = current_app.config['PUBLIC_KEY']
+            claims = jwt.decode(token, public_key)
+            user_roles = [r['role_name'] for r in claims.get('roles', [])]
+            if "Administrator" in user_roles:
+                is_admin = True
+        except Exception as ex:
+            print(f"Failed to decode token for /cars route roles check: {ex}")
+            is_admin = False
 
-    # if filter_type == "Numberplate":
-    #     cars = Cars.query.filter_by(numberplate=cid).all()
-    # elif filter_type == "Manufacturer":
-    #     cars = Cars.query.filter_by(manufacturer=cid).all()
-    # elif filter_type == "Model":
-    #     cars = Cars.query.filter_by(model=cid).all()
-    # elif filter_type == "Color":
-    #     cars = Cars.query.filter_by(color=cid).all()
-    # elif filter_type == "Price (Maximum)":
-    #     cars = db.session.execute(select(Cars).filter(Cars.price <= cid)).scalars().all()
-    # elif filter_type == "Price (Minimum)":
-    #     cars = db.session.execute(select(Cars).filter(Cars.price >= cid)).scalars().all()
-    # elif filter_type == "Mileage (Maximum)":
-    #     cars = db.session.execute(select(Cars).filter(Cars.kmcount <= cid)).scalars().all()
-    # elif filter_type == "Mileage (Minimum)":
-    #     cars = db.session.execute(select(Cars).filter(Cars.kmcount >= cid)).scalars().all()
-    # else:
-    #     cars = Cars.query.all()
-
-    # return render_template('cars.html', values=cars)
+    return render_template('cars.html', values=cars_list, is_admin=is_admin)
 
 # --- Terminate session
 @main_bp.route("/logout/")
 def logout():
-   if "user" in session:
-       session.pop("user", None)
-       session.pop("role", None)
-       flash("You've signed out!", "info")
-   return redirect(url_for("main.home"))
+    response = make_response(redirect(url_for("main.home")))
+
+    # Clear Flask server-side session data and JWT access_token cookie
+    if "user" in session:
+        session.pop("user", None)
+    if "role" in session:
+        session.pop("role", None)
+
+    response.delete_cookie('access_token')
+
+    flash("You've signed out!", "info")
+    return response
 
 # --- Admin page (if signed in as Administrator)
 @main_bp.route("/admin/")

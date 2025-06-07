@@ -95,7 +95,7 @@ class CarsService:
             # 3. Delete the car
             db.session.delete(car)
             db.session.commit()
-            return True, f"Car with ID:{cid} has been deleted."
+            return True, f"The selected car has been deleted."
         except Exception as ex:
             db.session.rollback()
             return False, f"Database error: {ex}"

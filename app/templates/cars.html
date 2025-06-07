@@ -73,8 +73,20 @@
                     <p class="card-text mb-0">${{ item.price }}/day</p>
                 </div>
             </div>
+
             <div class="card-footer">
+                {% if is_admin %}
+                <button type="button" class="btn btn-danger btn-sm w-100 del-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteConfirmationPopup"
+                        data-carid="{{ item.carid }}"
+                        data-carname="{{ item.manufacturer }} {{ item.model }} - {{ item.numberplate }}"
+                        id="">
+                    Delete
+                </button>
+                {% else %}
                 <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -82,6 +94,7 @@
 </div>
     {% endfor %}
 
+{# Renting modal #}
 <div class="modal fade" id="rentModal" tabindex="-1">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -109,6 +122,28 @@
     </div>
 </div>
 
+{# Delete confirmation modal #}
+<div class="modal fade" id="deleteConfirmationPopup" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="deleteForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" id="deleteCarId" name="carid">
+                    Are you sure you want to delete <strong id="carToDeleteName"></strong>? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const rentForm = document.getElementById('rentForm');
     document.querySelectorAll('.rent-btn').forEach(btn => {
@@ -116,6 +151,19 @@
             const carid = this.dataset.carid;
             document.getElementById('carid').value = carid;
             rentForm.action = `/rental/rent/${carid}`;
+        });
+    });
+</script>
+
+<script>
+    const deleteForm = document.getElementById('deleteForm');
+    document.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const carid = this.dataset.carid;
+            const carName = this.dataset.carname;
+            document.getElementById('deleteCarId').value = carid;
+            document.getElementById('carToDeleteName').textContent = carName;
+            deleteForm.action = `/car/remove/${carid}`;
         });
     });
 </script>

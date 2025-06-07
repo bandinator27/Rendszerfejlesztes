@@ -45,7 +45,7 @@ def rent_car_form(cid):
     try:
         token = request.cookies.get('access_token')
         if not token:
-            flash("Unauthorized: No token!", "danger")
+            flash("It looks like you're not signed in. Sign in first!", "warning")
             return redirect(url_for('main.login'))
 
         try:
@@ -68,9 +68,6 @@ def rent_car_form(cid):
             flash("Missing rental start date or duration.", "warning")
             return redirect(url_for('main.cars'))
 
-        # Print for debugging
-        print(f"Received rentstart: {rentstart}")
-        
         try:
             rent_start_dt = datetime.strptime(rentstart, "%Y-%m-%d")
             if rent_start_dt.date() < datetime.now().date():
