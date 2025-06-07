@@ -6,19 +6,20 @@ from sqlalchemy import select
 from datetime import datetime
 
 class RentalsService:
+
+# --- VIEW RENTALS
     @staticmethod
     def view_rentals():
         try:
-            rental = db.session.query(Rentals).all()
+            rentals = db.session.query(Rentals).all()
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
-        return True, RentalsSchema().dump(rental, many=True)
+        return True, RentalsSchema().dump(rentals, many=True)
     
     @staticmethod
     def view_rentals_user(user_id):
         try:
             rental = db.session.execute(select(Rentals).filter(Rentals.renterid == user_id)).scalars().all()
-            #rental = db.session.query(Rentals).all()
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rental, many=True)

@@ -1,6 +1,7 @@
-from flask import redirect, url_for, render_template, request, session, flash, make_response
+from flask import current_app, redirect, url_for, render_template, request, session, flash, make_response
 from app.extensions import db
 from app.models.addresses import Addresses
+from app.blueprints.user.schemas import PayloadSchema, RoleSchema
 from app.blueprints import main_bp
 from app.models.cars import *
 from app.models.rentals import *
@@ -12,7 +13,9 @@ from app.forms.loginform import LoginForm
 
 import requests
 from app.blueprints import verify_token, set_auth_headers
-
+from authlib.jose import jwt
+from authlib.jose import jwt
+from datetime import datetime, timedelta
 @main_bp.route("/")
 def home():
    if "user" in session:
@@ -61,11 +64,6 @@ def login():
             user_role_names = [role.role_name for role in user.roles]
             primary_role = next((r for r in role_hierarchy if r in user_role_names), None)
             session['role'] = primary_role
-
-            from authlib.jose import jwt
-            from datetime import datetime, timedelta
-            from flask import make_response, current_app
-            from app.blueprints.user.schemas import PayloadSchema, RoleSchema
 
             payload = PayloadSchema()
             payload.user_id = user.id
@@ -159,8 +157,6 @@ def view():
    return render_template('view.html', values=db.session.query(Users).all())
 
 # --- List cars
-from flask import current_app
-from authlib.jose import jwt
 @main_bp.route('/cars', methods=['GET'], strict_slashes=False)
 def cars():
     cid = request.args.get('cid', type=str)
@@ -241,7 +237,7 @@ def logout():
 
     response.delete_cookie('access_token')
 
-    flash("You've signed out!", "info")
+    flash("You're logged out!", "info")
     return response
 
 # --- Admin page (if signed in as Administrator)
@@ -268,7 +264,7 @@ def account():
            return redirect(url_for("main.home"))
    else:
        return redirect(url_for("main.home"))
-
+   
 @main_bp.route("/rentals/")
 def rentals():
    if "user" in session:

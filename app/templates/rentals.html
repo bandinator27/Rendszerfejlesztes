@@ -1,71 +1,101 @@
 {% extends "base.html" %}
-{% block title %}View all users{% endblock %}
+{% block title %} Rentals {% endblock %}
 {% block content %}
-	{% with messages = get_flashed_messages() %}
-		{% if messages %}
-			{% for msg in messages %}
-<p>{{msg}}</p>
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
-
-<script>
-view_rentals();
-function view_rentals()
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-        {
-            createRentalTable(xmlHttp.responseText);
-        }
-    }
-    xmlHttp.open("GET", "/rental/view_rentals_user", true); // true for asynchronous 
-    xmlHttp.send(null);
-}
-
-function createRentalTable(data) {
-const obj = JSON.parse(data);
-    for (var car of obj)
-    {
-        let row = `
-            <tr>
-                <td>${car.carid}</td>
-                <td>${car.rentduration}</td>
-                <td>${car.renteraddress}</td>
-                <td>${car.renterphonenum}</td>
-                <td>${car.rentprice}</td>
-                <td>${car.rentstart}</td>
-                <td>${car.rentstatus}</td>
-            </tr>`;
-
-        //let row = `<div class="card">
-        //<h5>${car.carid}</h5>
-        //</div>`;
-        document.getElementById('main').innerHTML += row;
-    }
-
-}
-
-</script>
 
 <div class="row pt-4 justify-content-center">
     <p class="text-center fs-3 pb-4">Current rentals</p>
     <table class="table table-striped table-hover w-auto">
         <thead>
             <tr>
-                <th>Numberplate</th>
-                <th>Rent duration (days)</th>
+                <th>Car</th>
+                <th>Length</th>
                 <th>Address</th>
                 <th>Phone number</th>
-                <th>Price / day</th>
+                <th>Price</th>
                 <th>Start date</th>
                 <th>Status</th>
+                {% if is_admin or is_clerk %}
+                <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
-        <tbody id="main">
+        <tbody id="rentalsTableBody">
+            {% for rental in rentals %}
+            <tr>
+                <td>{{ rental.carid }}</td>
+                <td>{{ rental.rentduration }}</td>
+                <td>{{ rental.renteraddress }}</td>
+                <td>{{ rental.renterphonenum }}</td>
+                <td>{{ rental.rentprice }}</td>
+                <td>{{ rental.rentstart[:10] }}</td>
+                <td>{{ rental.rentstatus }}</td>
+                {% if is_admin or is_clerk %}
+                <td>
+                    {% if rental.rentstatus == "Pending" %}
+                    <button class="btn btn-success btn-sm approve-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">
+                        Approve
+                    </button>
+                    {% endif %}
+                    {% if rental.rentstatus == "Rented" %}
+                    <button class="btn btn-danger btn-sm stop-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">
+                        Stop
+                    </button>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
+<script>
+    // Approve rental
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const carid = this.dataset.carid;
+            const renterid = this.dataset.renterid;
+
+            fetch(`/rental/approve/${carid}/${renterid}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        window.location.reload();
+                    }
+                })
+                .catch(error => alert('Error: ' + error));
+        });
+    });
+
+    // Stop rental
+    document.querySelectorAll('.stop-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const carid = this.dataset.carid;
+            const renterid = this.dataset.renterid;
+
+            fetch(`/rental/stop/${carid}/${renterid}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        window.location.reload();
+                    }
+                })
+                .catch(error => alert('Error: ' + error));
+        });
+    });
+</script>
 
 {% endblock %}
