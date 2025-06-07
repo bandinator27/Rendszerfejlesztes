@@ -1,27 +1,67 @@
-﻿from app.blueprints.rentals import rental_bp
-from app.blueprints import main_bp
-from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
+﻿from flask import request, redirect, url_for, flash, current_app, render_template, session
 from apiflask import HTTPError
+from app.models.rentals import Rentals
+from app.blueprints.rentals import rental_bp
 from app.blueprints.rentals.service import RentalsService
+from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
+from app.models.users import Users
+from app.models.cars import Cars
 from app.extensions import auth
 from app.blueprints import role_required
-from app.models.users import Users
 from app.extensions import db
+from datetime import datetime, timedelta
+from authlib.jose import jwt
 
 # @rental_bp.route('/')
 # def index():
 #     return 'This is the rentals Blueprint'
 
 # --- View rentals
-@rental_bp.get('/view_rentals')
-@rental_bp.doc(tags=["rentals"])
-@rental_bp.output(RentalsSchema(many = True))
+@rental_bp.route('/list_rentals')
 def view_rentals():
-    success, response = RentalsService.view_rentals()
-    if success:
-        return response, 200
-    raise HTTPError(message=response, status_code=400)
+    token = request.cookies.get('access_token')
+    if not token:
+        flash("It looks like you're not signed in. Sign in first!", "danger")
+        return redirect(url_for('main.login'))
+    try:
+        public_key = current_app.config['PUBLIC_KEY']
+        claims = jwt.decode(token, public_key)
+        claims.validate()
+    except Exception as ex:
+        flash("Unauthorized: invalid token. Sign in again!", "danger")
+        return redirect(url_for('main.logout'))
+    
+    # Get rentals based on user role
+    user_roles = claims.get("roles", [])
+    role_names = [role_dict.get('role_name') for role_dict in user_roles if role_dict.get('role_name')]
 
+    if "Administrator" in role_names or "Clerk" in role_names:
+        success, rentals = RentalsService.view_rentals()
+        is_admin = True if "Administrator" in role_names else False
+        is_clerk = True if "Clerk" in role_names else False
+    else:
+        success, rentals = RentalsService.view_rentals()
+
+    if not success:
+        flash(rentals, "danger")
+        rentals = []
+    return render_template('rentals.html', rentals=rentals, is_admin=is_admin, is_clerk=is_clerk)
+
+# @rental_bp.route('/list_rentals')
+# def view_rentals():
+#     # Check if user is logged in and is admin/clerk
+#     if not session.get("user") or session.get("role") not in ("Administrator", "Clerk"):
+#         flash("Unauthorized", "danger")
+#         return redirect(url_for('main.login'))
+
+#     success, rentals = RentalsService.view_rentals()
+#     if not success:
+#         flash(rentals, "danger")
+#         rentals = []
+
+#     return render_template('rentals.html', rentals=rentals)
+
+# --- View rentals for a user
 @rental_bp.get('/view_rentals_user')
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.output(RentalsSchema(many = True))
@@ -33,13 +73,6 @@ def view_rentals_user():
     raise HTTPError(message=response, status_code=400)
 
 # --- Renting
-from flask import request, redirect, url_for, flash, current_app
-from app.extensions import db
-from app.models.rentals import Rentals
-from app.models.cars import Cars
-from datetime import datetime, timedelta
-from authlib.jose import jwt
-
 @rental_bp.route('/rent/<int:cid>', methods=["POST"])
 def rent_car_form(cid):
     try:

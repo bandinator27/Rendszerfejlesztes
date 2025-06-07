@@ -1,25 +1,6 @@
 {% extends "base.html" %}
 {% block title %} Admin panel {% endblock %}
 {% block content %}
-	{% with messages = get_flashed_messages(with_categories = True) %}
-    {% if messages %}
-	    {% for category, msg in messages %}
-	    {% set icon_type =
-	    "check-circle" if category == "success"
-	    else "exclamation-triangle" if category == "danger"
-	    %}
-<div class="row text-center mt-4">
-    <div class="alert alert-{{ category }} d-flex alert-dismissible fade show col-sm-8 col-lg-4">
-        <i class="bi bi-{{ icon_type }} pe-2"></i>
-        <div>
-            {{ msg }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
-</div>
-	    {% endfor %}
-    {% endif %}
-    {% endwith %}
 
 <div class="row pt-4">
     <button type="button" class="btn btn-primary w-auto" data-bs-toggle="modal" data-bs-target="#addcar">
