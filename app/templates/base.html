@@ -10,7 +10,7 @@
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-md bg-body-tertiary">
+    <nav class="navbar navbar-expand-md bg-body-tertiary mb-4">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="/">Car Rental</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
@@ -46,7 +46,11 @@
                     {% endif %}
                 </ul>
                 {% if session["user"] %}
+
                 <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/rentals">Rentals</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/account">Account</a>
                     </li>

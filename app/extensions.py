@@ -6,4 +6,4 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
-auth = HTTPTokenAuth()
+auth = HTTPTokenAuth(scheme='Bearer')

@@ -9,7 +9,7 @@ from flask_cors import CORS
 def create_app(config_class=Config):
     app = APIFlask(__name__, json_errors= True, title="Berauto API", docs_path="/swagger")
     app.config.from_object(config_class)
-    CORS(app)
+    CORS(app, expose_headers='Authorization')
 
     db.init_app(app)
     migrate = Migrate(app, db, render_as_batch=True)

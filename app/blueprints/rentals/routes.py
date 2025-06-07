@@ -1,4 +1,5 @@
 ﻿from app.blueprints.rentals import rental_bp
+from app.blueprints import main_bp
 from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
 from apiflask import HTTPError
 from app.blueprints.rentals.service import RentalsService
@@ -21,13 +22,22 @@ def view_rentals():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+@rental_bp.get('/view_rentals_user')
+@rental_bp.doc(tags=["rentals"])
+@rental_bp.output(RentalsSchema(many = True))
+@rental_bp.auth_required(auth)
+def view_rentals_user():
+    success, response = RentalsService.view_rentals_user(auth.current_user.get("user_id"))
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
 # --- Renting
 from flask import request, redirect, url_for, flash, current_app
 from app.extensions import db
 from app.models.rentals import Rentals
 from app.models.cars import Cars
 from datetime import datetime, timedelta
-from app.extensions import auth
 from authlib.jose import jwt
 
 @rental_bp.route('/rent/<int:cid>', methods=["POST"])

@@ -13,6 +13,15 @@ class RentalsService:
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rental, many=True)
+    
+    @staticmethod
+    def view_rentals_user(user_id):
+        try:
+            rental = db.session.execute(select(Rentals).filter(Rentals.renterid == user_id)).scalars().all()
+            #rental = db.session.query(Rentals).all()
+        except Exception as ex:
+            return False, f"Database error! Details: {ex}"
+        return True, RentalsSchema().dump(rental, many=True)
 
 # --- RENTING
     @staticmethod

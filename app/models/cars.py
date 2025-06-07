@@ -8,6 +8,8 @@ class Cars(db.Model):
     numberplate: Mapped[str] = mapped_column(String(32))
     rentable: Mapped[int]
     price: Mapped[int]
+    year: Mapped[int]
+    image_url: Mapped[str] = mapped_column(String(32))
     manufacturer: Mapped[str] = mapped_column(String(32))
     model: Mapped[str] = mapped_column(String(32))
     color: Mapped[str] = mapped_column(String(32))

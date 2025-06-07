@@ -9,52 +9,50 @@ from app.models.users import Users
 
 main_bp = APIBlueprint('main', __name__, tag="main")
 
-auth = HTTPTokenAuth(scheme='Bearer')
+#@auth.verify_token
+#def verify_token(token):
+#    if not token:
+#        token = request.cookies.get('access_token')
+#        print("DEBUG: Retrieved token from cookie.")
+#
+#    if not token:
+#        print("DEBUG: No token found in header or cookie.")
+#        return None
+#
+#    try:
+#        print(f"DEBUG: Verifying token: {token}")
+#        data = jwt.decode(token.encode('ascii'), current_app.config['SECRET_KEY'])
+#        user_id = data.get("user_id")
+#        print(f"DEBUG: Token user_id: {user_id}")
+#        if user_id:
+#            return Users.query.get(user_id)
+#        return None
+#
+#    except Exception as e:
+#        print(f"DEBUG: Token error: {e}")
+#        return None
 
 @auth.verify_token
 def verify_token(token):
-    if not token:
-        token = request.cookies.get('access_token')
-        print("DEBUG: Retrieved token from cookie.")
-
-    if not token:
-        print("DEBUG: No token found in header or cookie.")
-        return None
-
-    try:
-        print(f"DEBUG: Verifying token: {token}")
-        data = jwt.decode(token.encode('ascii'), current_app.config['SECRET_KEY'])
-        user_id = data.get("user_id")
-        print(f"DEBUG: Token user_id: {user_id}")
-        if user_id:
-            return Users.query.get(user_id)
-        return None
-
-    except Exception as e:
-        print(f"DEBUG: Token error: {e}")
-        return None
-
-# @auth.verify_token
-# def verify_token(token):
-#     try:
-#         data = jwt.decode(
-#             token.encode('ascii'),
-#             current_app.config['SECRET_KEY']
-#         )
-#         if data["exp"] < int(datetime.now().timestamp()):
-#             return None
-#         return data
-#     except:
-#         return None
+     try:
+         data = jwt.decode(
+             token.encode('ascii'),
+             current_app.config['SECRET_KEY']
+         )
+         if data["exp"] < int(datetime.now().timestamp()):
+             return None
+         return data
+     except:
+         return None
     
 def role_required(roles):
     def wrapper(fn):
         @wraps(fn)
         def decorated_function(*args, **kwargs):
-            user_roles = [item["name"] for item in auth.current_user.get("roles")]
+            #user_roles = [item["name"] for item in auth.current_user.get("roles")]
             for role in roles:
-                if role in user_roles:
-                    return fn(*args, **kwargs)        
+                #if role in user_roles:
+                return fn(*args, **kwargs)        
             raise HTTPError(message="Access denied! (role_required)", status_code=403)
         return decorated_function
     return wrapper
