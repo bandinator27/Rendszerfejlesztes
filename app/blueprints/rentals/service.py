@@ -44,22 +44,7 @@ class RentalsService:
             except (ValueError, TypeError):
                 return False, "Rental duration must be a number"
 
-            # Check if current user already has a rental for this car
-            # existing_rental = db.session.get(Rentals, (carid, request["renterid"]))
-            # if existing_rental:
-            #     return False, f"You already have a rental for Car #{carid}."
-
-            # Check if car is already rented/pending
-            # active_rental = db.session.execute(
-            #     select(Rentals).filter(
-            #         Rentals.carid == carid,
-            #         Rentals.rentstatus.in_(["Rented", "Pending"]),
-            #     )).scalar_one_or_none()
-
-            # if active_rental:
-            #     return False, f"Car #{carid} is currently unavailable."
-
-            # Set the car to rentable=0
+           # Set the car to rentable=0
             car = db.session.get(Cars, carid)
             if not car:
                 return False, f"Car #{carid} not found."
@@ -97,7 +82,7 @@ class RentalsService:
             db.session.rollback()
             return False, f"Error while approving rental. Details: {ex}"
 
-# --- SET RENTAL STATUS
+    # --- SET RENTAL STATUS
     @staticmethod
     def set_car_rentstatus(carid, request):
         try:
@@ -112,6 +97,27 @@ class RentalsService:
                 car = db.session.get(Cars, carid)
             if car:
                 car.rentable = 1
+            db.session.commit()
+
+        except Exception as ex:
+            return False, f"Database error! Details: {ex}"
+        return True, "Rental stopped, car marked as available."
+
+# --- STOP RENTAL
+    @staticmethod
+    def stop_rental(rentalid):
+        print("start of stop_rental")
+        try:
+            rental = db.session.get(Rentals, rentalid)
+            if rental is None:
+                return False, "This rental does not exist."
+
+            rental.rentstatus = "Available"
+
+            car = db.session.get(Cars, rental.carid)
+            if car:
+                car.rentable = 1
+            db.session.delete(rental)
             db.session.commit()
 
         except Exception as ex:

@@ -21,9 +21,10 @@
             </tr>
         </thead>
         <tbody>
+            {% if rentals %}
             {% for rental in rentals %}
             <tr>
-                <td>#{{ rental.rentalid }}</td> 
+                <td>#{{ rental.rentalid }}</td>
                 <td>{{ rental.carid }}</td>
                 <td>{{ rental.rentduration }}</td>
                 <td>{{ rental.renteraddress }}</td>
@@ -39,7 +40,7 @@
                     </form>
                     {% endif %}
                     {% if rental.rentstatus == "Rented" %}
-                    <form action="{{ url_for('main.rentals.stop_rental', rentalid=rental.rentalid) }}" method="post">
+                    <form action="{{ url_for('main.rentals.stop_rental_form', rentalid=rental.rentalid) }}" method="post">
                         <button class="btn btn-danger btn-sm stop-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">Stop</button>
                     </form>
                     {% endif %}
@@ -47,6 +48,13 @@
                 {% endif %}
             </tr>
             {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="9">
+                    <p class="text-center text-muted my-3">There are no pending or active rentals to display.</p>
+                </td>
+            </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>

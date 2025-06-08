@@ -2,18 +2,18 @@
 {% block title %} My account {% endblock %}
 {% block content %}
 <div class="row">
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover mt-4">
-            <tbody>
-                <tr><th>ID</th><td>{{ userAccount.id }}</td></tr>
-                <tr><th>Name</th><td>{{ userAccount.username }}</td></tr>
-                <tr><th>Password</th><td>{{ userAccount.password }}</td></tr>
-                <tr><th>Password Salt</th><td>{{ userAccount.password_salt }}</td></tr>
-                <tr><th>Email</th><td>{{ userAccount.email }}</td></tr>
-                <tr><th>Address</th><td>{{ userAccount.address.postalcode }} {{ userAccount.address.city }}, {{ userAccount.address.street }}</td></tr>
-                <tr><th>Phone number</th><td>{{ userAccount.phone_number }}</td></tr>
-            </tbody>
-        </table>
+    <h1>Personal details</h1>
+    <div class="row col-lg-4">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex align-items-center" title="Username"><i class="bi bi-person fs-4 pe-3"></i>{{ userAccount.username }}</li>
+            <li class="list-group-item d-flex align-items-center" title="Email"><i class="bi bi-envelope fs-4 pe-3"></i>{{ userAccount.email }}</li>
+            <li class="list-group-item d-flex align-items-center" title="Address"><i class="bi bi-map fs-4 pe-3"></i>{{ userAccount.address.postalcode }} {{ userAccount.address.city }}, {{userAccount.address.street }}</li>
+            <li class="list-group-item d-flex align-items-center" title="Phone number"><i class="bi bi-telephone fs-4 pe-3"></i>{{ userAccount.phone_number }}</li>
+        </ul>
+    </div>
+    <div class="row pt-4">
+        <h1>My rentals</h1>
+        <p>todo</p>
     </div>
 </div>
 
