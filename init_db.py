@@ -11,7 +11,7 @@ from datetime import datetime
 
 app = create_app(config_class=Config)
 app.app_context().push()
-db.drop_all()  # Előző adatbázis törlése, ha van
+db.drop_all()  # Delete previous databse if there is one
 db.create_all()
 
 # --- ADDRESSES test data
@@ -34,7 +34,7 @@ db.session.add_all([
             password=generate_password_hash("teszt123"),
             password_salt="salty",
             address_id=1,
-            email="tesztbela@berauto.hu",
+            email="bela@berauto.hu",
             phone_number="+3670123456",
         ),
         Users(
@@ -42,7 +42,7 @@ db.session.add_all([
             password=generate_password_hash("teszt123"),
             password_salt="salty",
             address_id=2,
-            email="tesztjani@berauto.hu",
+            email="jani@berauto.hu",
             phone_number="+3670123457",
         ),
         Users(
@@ -134,31 +134,31 @@ db.session.add_all([
         Rentals(
             carid=1,
             renterid=1,
-            rentstart=datetime.strptime("2025-06-07", "%Y-%m-%d"),
+            rentstart=datetime.strptime("2025-06-10", "%Y-%m-%d"),
             rentstatus="Rented",
-            rentduration=1,
+            rentduration=3,
             rentprice=500,
-            renteraddress="Veszprém, Privát utca 1",
+            renteraddress="Veszprém, Privát utca 1.",
             renterphonenum="+36201234567"
         ),
         Rentals(
             carid=2,
             renterid=3,
-            rentstart=datetime.strptime("2025-06-07", "%Y-%m-%d"),
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
             rentstatus="Rented",
-            rentduration=1,
+            rentduration=5,
             rentprice=500,
-            renteraddress="Veszprém, Privát utca 1",
+            renteraddress="Balatonlelle, Kossuth utca 12.",
             renterphonenum="+36201234567"
         ),
         Rentals(
             carid=3,
             renterid=2,
-            rentstart=datetime.strptime("2025-05-18", "%Y-%m-%d"),
+            rentstart=datetime.strptime("2025-05-30", "%Y-%m-%d"),
             rentstatus="Pending",
             rentduration=15,
             rentprice=1500,
-            renteraddress="Veszprém, Privát utca 2",
+            renteraddress="Budapest, József A. utca 6.",
             renterphonenum="+36701234568"
         )])
 

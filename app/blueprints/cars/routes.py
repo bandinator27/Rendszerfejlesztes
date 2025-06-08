@@ -78,7 +78,7 @@ def add_car_form():
     form_data['rentable'] = 1
     token = request.cookies.get('access_token')
     if not token:
-        flash("It looks like you're not signed in. Sign in first!", "danger")
+        flash("Looks like you're not signed in. Sign in first!", "danger")
         return redirect(url_for('main.login'))
     try:
         public_key = current_app.config['PUBLIC_KEY']
@@ -151,7 +151,7 @@ def remove_car(cid):
 def del_car_form(cid):
     token = request.cookies.get('access_token')
     if not token:
-        flash("It looks like you're not signed in. Sign in first!", "danger")
+        flash("Looks like you're not signed in. Sign in first!", "danger")
         return redirect(url_for('main.login'))
     try:
         public_key = current_app.config['PUBLIC_KEY']

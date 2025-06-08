@@ -3,6 +3,7 @@ from apiflask.fields import String, Integer
 from datetime import datetime
 
 class RentalsSchema(Schema):
+    rentalid = Integer(required=True)
     carid = Integer()
     renterid = Integer()
     rentstart = String()

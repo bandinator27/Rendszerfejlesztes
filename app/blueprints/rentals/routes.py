@@ -21,17 +21,16 @@ from authlib.jose import jwt
 def view_rentals():
     token = request.cookies.get('access_token')
     if not token:
-        flash("It looks like you're not signed in. Sign in first!", "danger")
+        flash("Looks like you're not signed in. Sign in first!", "warning")
         return redirect(url_for('main.login'))
     try:
         public_key = current_app.config['PUBLIC_KEY']
         claims = jwt.decode(token, public_key)
         claims.validate()
     except Exception as ex:
-        flash("Unauthorized: invalid token. Sign in again!", "danger")
+        flash("Looks like you're not signed in. Sign in first!", "danger")
         return redirect(url_for('main.logout'))
     
-    # Get rentals based on user role
     user_roles = claims.get("roles", [])
     role_names = [role_dict.get('role_name') for role_dict in user_roles if role_dict.get('role_name')]
 
@@ -78,7 +77,7 @@ def rent_car_form(cid):
     try:
         token = request.cookies.get('access_token')
         if not token:
-            flash("It looks like you're not signed in. Sign in first!", "warning")
+            flash("Looks like you're not signed in. Sign in first!", "warning")
             return redirect(url_for('main.login'))
 
         try:
@@ -156,7 +155,7 @@ def rent_car_form(cid):
 
         success, response = RentalsService.rent_car(cid, rental_data)
         if success:
-            flash("Rental request submitted!", "success")
+            flash("Rental request submitted!", "info")
         else:
             flash(response, "danger")
         return redirect(url_for('main.cars'))
@@ -207,24 +206,47 @@ def set_car_rentstatus(cid, json_data):
     raise HTTPError(message=response, status_code=400)
 
 # --- Approving a rental
-@rental_bp.post('/approve/<int:carid>/<int:renterid>')
+@rental_bp.post('/api/approve/<int:rentalid>')
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.auth_required(auth)
 @role_required(["Clerk", "Administrator"])
-def approve_rental(carid, renterid):
+def approve_rental(rentalid):
     # renterid = json_data.get("renterid")
-    success, response = RentalsService.approve_rental(carid, renterid)
+    success, response = RentalsService.approve_rental(rentalid)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+@rental_bp.route('/approve/<int:rentalid>', methods=["POST"])
+@rental_bp.doc(tags=["rentals"])
+def approve_rental_form(rentalid):
+    try:
+        token = request.cookies.get('access_token')
+        if not token:
+            flash("Looks like you're not signed in. Sign in first!", "warning")
+            return redirect(url_for('main.login'))
+        try:
+            public_key = current_app.config['PUBLIC_KEY']
+            claims = jwt.decode(token, public_key)
+            claims.validate()
+        except Exception as ex:
+            flash("Unauthorized: Invalid token!", "danger")
+            return redirect(url_for('main.rentals.view_rentals'))
+    except Exception as ex:
+        flash(f"Error processing rental: {ex}", "danger")
+        return redirect(url_for('main.rentals.view_rentals'))
+    success, response = RentalsService.approve_rental(rentalid)
+    if success:
+        flash("Rental approved!", "success")
+        return redirect(url_for('main.rentals.view_rentals'))
+
 # --- Stop a rental
-@rental_bp.post('/stop/<int:carid>/<int:renterid>')
+@rental_bp.post('/stop/<int:rentalid>')
 @rental_bp.auth_required(auth)
 @role_required(["Clerk", "Administrator"])
-def stop_rental(carid, renterid):
+def stop_rental(rentalid):
     try:
-        success, response = RentalsService.set_car_rentstatus(carid, {"renterid": renterid, "rentstatus": "Available"})
+        success, response = RentalsService.set_car_rentstatus(rentalid, {"rentstatus": "Available"})
         if success:
             return response, 200
         raise HTTPError(message=response, status_code=400)
