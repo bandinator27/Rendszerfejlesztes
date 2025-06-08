@@ -155,7 +155,7 @@ def rent_car_form(cid):
 
         success, response = RentalsService.rent_car(cid, rental_data)
         if success:
-            flash("Rental request submitted!", "success")
+            flash("Rental request submitted!", "info")
         else:
             flash(response, "danger")
         return redirect(url_for('main.cars'))
@@ -216,6 +216,29 @@ def approve_rental(rentalid):
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
+
+@rental_bp.route('/approve/<int:rentalid>', methods=["POST"])
+@rental_bp.doc(tags=["rentals"])
+def approve_rental_form(rentalid):
+    try:
+        token = request.cookies.get('access_token')
+        if not token:
+            flash("Looks like you're not signed in. Sign in first!", "warning")
+            return redirect(url_for('main.login'))
+        try:
+            public_key = current_app.config['PUBLIC_KEY']
+            claims = jwt.decode(token, public_key)
+            claims.validate()
+        except Exception as ex:
+            flash("Unauthorized: Invalid token!", "danger")
+            return redirect(url_for('main.rentals.view_rentals'))
+    except Exception as ex:
+        flash(f"Error processing rental: {ex}", "danger")
+        return redirect(url_for('main.rentals.view_rentals'))
+    success, response = RentalsService.approve_rental(rentalid)
+    if success:
+        flash("Rental approved!", "success")
+        return redirect(url_for('main.rentals.view_rentals'))
 
 # --- Stop a rental
 @rental_bp.post('/stop/<int:rentalid>')

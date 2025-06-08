@@ -34,7 +34,7 @@
                 {% if is_admin or is_clerk %}
                 <td>
                     {% if rental.rentstatus == "Pending" %}
-                    <form action="{{ url_for('main.rentals.approve_rental', rentalid=rental.rentalid) }}" method="post">
+                    <form action="{{ url_for('main.rentals.approve_rental_form', rentalid=rental.rentalid) }}" method="post">
                         <button class="btn btn-success btn-sm approve-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">Approve</button>
                     </form>
                     {% endif %}

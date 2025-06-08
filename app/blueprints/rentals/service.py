@@ -79,7 +79,6 @@ class RentalsService:
 # --- APPROVE RENTAL
     @staticmethod
     def approve_rental(rentalid):
-        print(f"DEBUG: Approving rental with ID: {rentalid}")
         try:
             rental = db.session.execute(
                 select(Rentals).filter_by(
