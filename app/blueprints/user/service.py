@@ -78,7 +78,6 @@ class UserService:
 # --- Token generation
     @staticmethod
     def token_generate(user : Users):
-        print(f"DEBUG: Generating token for user {user.username}")
         payload = PayloadSchema()
         payload.user_id = user.id
         payload.roles = RoleSchema().dump(obj=user.roles, many=True)

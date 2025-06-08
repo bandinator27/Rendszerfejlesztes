@@ -103,10 +103,9 @@ def rent_car_form(cid):
         try:
             rent_start_dt = datetime.strptime(rentstart, "%Y-%m-%d")
             if rent_start_dt.date() < datetime.now().date():
-                flash("Rental start date cannot be in the past.", "warning")
+                flash("Time travel has not been invented yet so you have to pick a date in the present.", "warning")
                 return redirect(url_for('main.cars'))
         except ValueError as ve:
-            print(f"Date parsing error: {ve}")
             flash("Invalid date format. Please use the date picker.", "warning")
             return redirect(url_for('main.cars'))
 
@@ -150,9 +149,6 @@ def rent_car_form(cid):
             "rentstatus": "Pending"
         }
         
-        print(f"Rental data being sent to service: {rental_data}")
-        print(f"rentduration type: {type(rental_data['rentduration'])}")
-
         success, response = RentalsService.rent_car(cid, rental_data)
         if success:
             flash("Rental request submitted!", "info")
@@ -241,7 +237,7 @@ def approve_rental_form(rentalid):
         return redirect(url_for('main.rentals.view_rentals'))
 
 # --- Stop a rental
-@rental_bp.post('/stop/<int:rentalid>')
+@rental_bp.post('/api/stop/<int:rentalid>')
 @rental_bp.auth_required(auth)
 @role_required(["Clerk", "Administrator"])
 def stop_rental(rentalid):
@@ -252,3 +248,28 @@ def stop_rental(rentalid):
         raise HTTPError(message=response, status_code=400)
     except Exception as ex:
         return {"message": f"Error: {ex}"}, 400
+
+@rental_bp.route('/stop/<int:rentalid>', methods=["POST"])
+@rental_bp.doc(tags=["rentals"])
+def stop_rental_form(rentalid):
+    print(rentalid)
+    try:
+        token = request.cookies.get('access_token')
+        if not token:
+            flash("Looks like you're not signed in. Sign in first!", "warning")
+            return redirect(url_for('main.login'))
+        public_key = current_app.config['PUBLIC_KEY']
+        claims = jwt.decode(token, public_key)
+        claims.validate()
+        
+        success, response = RentalsService.stop_rental(rentalid)
+    
+        if success:
+            flash("The rental has ended!", "success")
+            return redirect(url_for('main.rentals.view_rentals'))
+        else:
+            flash(response, "danger")
+    except Exception as ex:
+        flash(f"Error processing rental: {ex}", "danger")
+        
+    return redirect(url_for('main.rentals.view_rentals'))

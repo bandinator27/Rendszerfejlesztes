@@ -231,7 +231,6 @@ def cars():
             if "Administrator" in user_roles:
                 is_admin = True
         except Exception as ex:
-            print(f"Failed to decode token for /cars route roles check: {ex}")
             is_admin = False
 
     return render_template('cars.html', values=cars_list, is_admin=is_admin)
