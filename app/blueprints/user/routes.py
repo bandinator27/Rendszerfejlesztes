@@ -17,7 +17,6 @@ from flask import redirect, url_for
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserLoginSchema, location="form")
 def user_login(form_data):
-     print(form_data)
      success, response = UserService.user_login(form_data)
      if success:
          return response, 200
