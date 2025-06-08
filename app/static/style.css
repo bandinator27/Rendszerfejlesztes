@@ -9,3 +9,7 @@ body {
 .separator {
     border-right: 1px solid #bbb;
 }
+
+.nav-link:hover {
+    text-decoration: underline;
+}

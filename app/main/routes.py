@@ -1,22 +1,16 @@
-from flask import current_app, redirect, url_for, render_template, request, session, flash, make_response
+from flask import redirect, url_for, render_template, request, session, flash, make_response
 from app.extensions import db
-from app.models.addresses import Addresses
-from app.blueprints.user.schemas import PayloadSchema, RoleSchema
-from app.blueprints import main_bp
+from app.blueprints import main_bp, verify_token, set_auth_headers
 from app.models.cars import *
 from app.models.rentals import *
 from app.models.roles import *
 from app.models.users import *
-from werkzeug.security import check_password_hash, generate_password_hash
-from sqlalchemy import select
+from werkzeug.security import generate_password_hash
 from app.forms.loginform import LoginForm
 from app.forms.registerform import RegisterForm
-
 import requests
-from app.blueprints import verify_token, set_auth_headers
 from authlib.jose import jwt
-from authlib.jose import jwt
-from datetime import datetime, timedelta
+
 @main_bp.route("/")
 def home():
    if "user" in session:
@@ -27,10 +21,9 @@ def home():
 
 @main_bp.route("/login/", methods=['POST', 'GET'])
 def login():
-    
     form = LoginForm()
     if form.validate_on_submit():
-        flash("Login requested for user {}".format(form.username.data))
+        print(f"Login requested for {form.username.data}")
            
         login_request = requests.post('http://localhost:5000/user/login',
                         json={
@@ -67,45 +60,6 @@ def login():
 
     return render_template('login.html', name='Sign In', form=form)
 
-    #if request.method == 'POST':
-    #
-    #    username = request.form.get('username')
-    #    password = request.form.get('password')
-    #
-    #    user = db.session.query(Users).filter_by(username=username).first()
-    #
-    #    if user and check_password_hash(user.password, password):
-    #        session['user'] = user.username
-    #
-    #        # Determine primary role
-    #        all_roles_ordered_by_id = db.session.execute(select(Roles).order_by(Roles.id.desc())).scalars().all()
-    #        role_hierarchy = [role.role_name for role in all_roles_ordered_by_id]
-    #        user_role_names = [role.role_name for role in user.roles]
-    #        primary_role = next((r for r in role_hierarchy if r in user_role_names), None)
-    #        session['role'] = primary_role
-    #
-    #        payload = PayloadSchema()
-    #        payload.user_id = user.id
-    #        payload.roles = RoleSchema().dump(obj=user.roles, many=True)
-    #        payload.exp = int((datetime.now() + timedelta(minutes=30)).timestamp())
-    #
-    #        header = {'alg': 'RS256'}
-    #        claims = PayloadSchema().dump(payload)
-    #        private_key = current_app.config['SECRET_KEY']
-    #        token = jwt.encode(header, claims, private_key).decode()
-    #
-    #        resp = make_response(redirect(url_for('main.home')))
-    #        resp.set_cookie('access_token', token, httponly=True, secure=False, samesite='Lax')
-    #        
-    #        flash("You're signed in!", "info")
-    #        return resp
-    #
-    #    else:
-    #        flash("Incorrect sign-in details!", "danger")
-    #        return render_template('login.html', register=url_for('main.register'))
-    #
-    #return render_template('login.html', register=url_for('main.register'))
-
 # --- Registration
 @main_bp.route("/register/", methods=['GET', 'POST'])
 def register():
@@ -124,7 +78,7 @@ def register():
                     'postalcode': form.postal.data       
                 }
             })
-        
+
         register_response = register_request.json()
         print(register_response)
         print(register_request)
@@ -192,22 +146,6 @@ def cars():
     else:
         cars_list = query.all()
 
-    is_admin = False
-    token = request.cookies.get('access_token')
-    if token:
-        try:
-            #public_key = current_app.config['PUBLIC_KEY']
-            #claims = jwt.decode(token, public_key)
-            #user_roles = [r['role_name'] for r in claims.get('roles', [])]
-            #if "Administrator" in user_roles:
-            #    is_admin = True
-            if 'Administrator' in session['role']:
-                is_admin = True
-
-        except Exception as ex:
-            print(f"Failed to decode token for /cars route roles check: {ex}")
-            is_admin = False
-
     return render_template('cars.html', values=cars_list)
 
 # --- Admin page (if signed in as Administrator)
@@ -272,7 +210,6 @@ def admin_page():
 
     return render_template('cars_admin.html', values=cars_list, is_admin=True)
 
-
 # --- Terminate session
 @main_bp.route("/logout/")
 def logout():
@@ -301,7 +238,7 @@ def account():
            return redirect(url_for("main.home"))
    else:
        return redirect(url_for("main.home"))
-   
+
 @main_bp.route("/rentals/")
 def rentals():
    if "user" in session:

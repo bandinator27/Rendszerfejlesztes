@@ -90,12 +90,12 @@ def add_car_form():
 
     user_roles = [r['role_name'] for r in claims.get('roles', [])]
     if "Administrator" not in user_roles:
-        flash("Warning: You don't have access to add a car!", "warning")
+        flash("You don't have permission to add a car!", "warning")
         return redirect(url_for('main.home'))
     
     new_numberplate = form_data.get('numberplate')
     if not new_numberplate:
-        flash("Numberplate is required to add a car.", "danger")
+        flash("A numberplate is required to add a car.", "danger")
         return render_template("admin.html")
 
     # Query the database for existing cars with the same numberplate (case-insensitive)
@@ -125,7 +125,7 @@ def add_car_form():
             flash(f"Error saving image: {e}", "danger")
             return render_template("admin.html")
     else:
-        flash("Invalid image file type. Only PNG, JPG, JPEG, GIF are allowed.", "danger")
+        flash("Invalid image file type. Only PNG, JPG, JPEG is allowed.", "warning")
         return render_template("admin.html")
 
     success, response = CarsService.add_car(form_data)
@@ -133,7 +133,7 @@ def add_car_form():
         flash("Car added successfully!", "success")
         return redirect(url_for('main.admin_page'))
     
-    flash("Failed to add car", "danger")
+    flash("Failed to add car!", "danger")
     return render_template("admin.html")
 
 # --- Delete a car
@@ -162,7 +162,7 @@ def del_car_form(cid):
 
     user_roles = [r['role_name'] for r in claims.get('roles', [])]
     if "Administrator" not in user_roles:
-        flash("Warning: You don't have permission to delete a car!", "warning")
+        flash("You don't have permission to delete a car!", "warning")
         return redirect(url_for('main.cars'))
 
     success, message = CarsService.remove_car(cid)

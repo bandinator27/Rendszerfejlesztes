@@ -2,11 +2,35 @@
 {% block title %} All cars {% endblock %}
 {% block content %}
 
-<div class="row pt-4">
+<div class="row justify-content-center pb-4">
     <button type="button" class="btn btn-primary w-auto" data-bs-toggle="modal" data-bs-target="#addcar">
         Add new car
     </button>
 </div>
+
+<div class="row justify-content-center pb-4">
+    <div class="col-lg-5 my-6">
+        <form action="{{ url_for('main.cars') }}" method="get">
+            <div class="input-group">
+                <select class="form-select" name="type">
+                    <option>Numberplate</option>
+                    <option>Manufacturer</option>
+                    <option>Model</option>
+                    <option>Color</option>
+                    <option>Price (Maximum)</option>
+                    <option>Price (Minimum)</option>
+                    <option>Mileage (Maximum)</option>
+                    <option>Mileage (Minimum)</option>
+                </select>
+                <input type="text" name="cid" class="form-control" placeholder="filter by this value" required>
+                <button class="btn btn-outline-light" type="submit">Show</button>
+                <a href="{{ url_for('main.cars') }}" class="btn btn-outline-light">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Add new car modal #}
 <div class="modal fade" id="addcar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -70,29 +94,6 @@
         </div> <!--modal-content-->
     </div> <!--modal-dialog-->
 </div> <!--modal-->
-
-
-<div class="row justify-content-center mb-4">
-    <div class="col-lg-6 col-sm-6 my-6">
-        <form action="{{ url_for('main.cars') }}" method="get">
-            <div class="input-group">
-                <select class="form-select" name="type">
-                    <option>Numberplate</option>
-                    <option>Manufacturer</option>
-                    <option>Model</option>
-                    <option>Color</option>
-                    <option>Price (Maximum)</option>
-                    <option>Price (Minimum)</option>
-                    <option>Mileage (Maximum)</option>
-                    <option>Mileage (Minimum)</option>
-                </select>
-                <input type="text" name="cid" class="form-control" placeholder="filter by this value" required>
-                <button class="btn btn-outline-light" type="submit">Show</button>
-                <a href="{{ url_for('main.cars') }}" class="btn btn-outline-light">Reset</a>
-            </div>
-        </form>
-    </div>
-</div>
 
     {% for row_items in values|batch(4) %}
 <div class="row row-cols-1 row-cols-md-4 pb-4">

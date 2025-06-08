@@ -46,20 +46,6 @@ def view_rentals():
         rentals = []
     return render_template('rentals.html', rentals=rentals, is_admin=is_admin, is_clerk=is_clerk)
 
-# @rental_bp.route('/list_rentals')
-# def view_rentals():
-#     # Check if user is logged in and is admin/clerk
-#     if not session.get("user") or session.get("role") not in ("Administrator", "Clerk"):
-#         flash("Unauthorized", "danger")
-#         return redirect(url_for('main.login'))
-
-#     success, rentals = RentalsService.view_rentals()
-#     if not success:
-#         flash(rentals, "danger")
-#         rentals = []
-
-#     return render_template('rentals.html', rentals=rentals)
-
 # --- View rentals for a user
 @rental_bp.get('/view_rentals_user')
 @rental_bp.doc(tags=["rentals"])
@@ -97,7 +83,7 @@ def rent_car_form(cid):
             return redirect(url_for('main.cars'))
 
         if not rentstart or not rentduration:
-            flash("Missing rental start date or duration.", "warning")
+            flash("Please enter a date and the number of days for which you'd like to rent.", "warning")
             return redirect(url_for('main.cars'))
 
         try:
@@ -130,7 +116,7 @@ def rent_car_form(cid):
             rental_duration = int(rental.rentduration)
             existing_end = existing_start + timedelta(days=rental_duration)
             if (rent_start_dt <= existing_end and rent_end_dt >= existing_start):
-                flash(f"Car #{cid} is already rented during that time.", "warning")
+                flash(f"The selected car is already rented during that time.", "warning")
                 return redirect(url_for('main.cars'))
 
         car = db.session.get(Cars, cid)
