@@ -1,0 +1,221 @@
+﻿{% extends "base.html" %}
+{% block title %} All cars {% endblock %}
+{% block content %}
+
+<div class="row pt-4">
+    <button type="button" class="btn btn-primary w-auto" data-bs-toggle="modal" data-bs-target="#addcar">
+        Add new car
+    </button>
+</div>
+<div class="modal fade" id="addcar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addcarLabel">New car details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form class="row" id="addCarForm" action="{{ url_for('main.car.add_car_form') }}" method="post" enctype="multipart/form-data">
+                    {% set text_fields = [
+                    ('manufacturer', 'Manufacturer'),
+                    ('model', 'Model'),
+                    ('numberplate', 'Number plate'),
+                    ('interior', 'Interior'),
+                    ('enginetype', 'Engine type'),
+                    ('fueltype', 'Fuel type'),
+                    ('gearbox', 'Gearbox'),
+                    ('bodytype', 'Body type'),
+                    ('color', 'Color'),
+                    ('extras', 'Extras')
+                    ] %}
+                    {% set number_fields = [
+                    ('year', 'Year'),
+                    ('doors', 'Doors'),
+                    ('seats', 'Seats'),
+                    ('power', 'Power'),
+                    ('topspeed', 'Top speed'),
+                    ('kmcount', 'Mileage'),
+                    ('price', 'Price')
+                    ] %}
+
+                    {% for id, label in text_fields %}
+                    <div class="col-3">
+                        <div class="form-floating mb-3">
+                            <input type="text" value="Text" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="{{ label }}" required>
+                            <label for="{{ id }}">{{ label }}</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% for id, label in number_fields %}
+                    <div class="col-3">
+                        <div class="form-floating mb-3">
+                            <input type="number" value="4" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="{{ label }}" required>
+                            <label for="{{ id }}">{{ label }}</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="col-6">
+                        <label for="carImage" class="form-label">Image:</label>
+                        <input type="file" class="form-control" id="carImage" name="car_image" accept="image/*" required>
+                        <div class="form-text">Allowed formats: PNG, JPG, JPEG. Max size: 8MB.</div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button class="btn btn-secondary" type="submit">Add car</button>
+                    </div>
+                </form>
+            </div><!--modal-body-->
+        </div> <!--modal-content-->
+    </div> <!--modal-dialog-->
+</div> <!--modal-->
+
+
+<div class="row justify-content-center mb-4">
+    <div class="col-lg-6 col-sm-6 my-6">
+        <form action="{{ url_for('main.cars') }}" method="get">
+            <div class="input-group">
+                <select class="form-select" name="type">
+                    <option>Numberplate</option>
+                    <option>Manufacturer</option>
+                    <option>Model</option>
+                    <option>Color</option>
+                    <option>Price (Maximum)</option>
+                    <option>Price (Minimum)</option>
+                    <option>Mileage (Maximum)</option>
+                    <option>Mileage (Minimum)</option>
+                </select>
+                <input type="text" name="cid" class="form-control" placeholder="filter by this value" required>
+                <button class="btn btn-outline-light" type="submit">Show</button>
+                <a href="{{ url_for('main.cars') }}" class="btn btn-outline-light">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+    {% for row_items in values|batch(4) %}
+<div class="row row-cols-1 row-cols-md-4 pb-4">
+    {% for item in row_items %}
+    <div class="col">
+        <div class="card h-100 text-bg-light border-dark">
+            {% set url = "/images/" + item.image_url %}
+            <img src="{{ url_for('static', filename=url) }}" class="card-img-top" alt="Car image">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.manufacturer }} {{ item.model }} - {{ item.year }}</h5>
+                <p class="card-text">{{ item.numberplate }}</p>
+                <p class="card-text">{{ item.color }} with {{ item.interior }} interior</p>
+                <p class="card-text">Extras: {{ item.extras }}</p>
+                <p class="card-text">Mileage: {{ item.kmcount | thousands_separator }} km</p>
+                <p class="card-text">{{ item.enginetype }}, {{ item.power }} HP {{ item.fueltype }} engine </p>
+            </div>
+            <div class="row text-center align-items-center g-0 pb-2">
+                <div class="col-md-4 separator">
+                    <i class="bi bi-person fs-4 d-block"></i>
+                    <p class="card-text mb-0">{{ item.seats }}</p>
+                </div>
+                <div class="col-md-4 separator">
+                    <i class="bi bi-speedometer2 fs-4 d-block"></i>
+                    <p class="card-text mb-0">{{ item.topspeed }} km/h</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="bi bi-cash fs-4 d-block"></i>
+                    <p class="card-text mb-0">${{ item.price }}/day</p>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                {% if is_admin %}
+                <button type="button" class="btn btn-danger btn-sm w-100 del-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteConfirmationPopup"
+                        data-carid="{{ item.carid }}"
+                        data-carname="{{ item.manufacturer }} {{ item.model }} - {{ item.numberplate }}"
+                        id="">
+                    Delete
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+    {% endfor %}
+
+{# Renting modal #}
+<div class="modal fade" id="rentModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rentModalLabel">Rental details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="rentForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" id="carid" name="carid">
+                    <div class="mb-3">
+                        <label for="rentstart" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="rentstart" name="rentstart" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rentduration" class="form-label">Rental Duration (days)</label>
+                        <input type="number" min="1" class="form-control" id="rentduration" name="rentduration" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Send request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# Delete confirmation modal #}
+<div class="modal fade" id="deleteConfirmationPopup" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="deleteForm" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" id="deleteCarId" name="carid">
+                    Are you sure you want to delete <strong id="carToDeleteName"></strong>? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rentForm = document.getElementById('rentForm');
+    document.querySelectorAll('.rent-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const carid = this.dataset.carid;
+            document.getElementById('carid').value = carid;
+            rentForm.action = `/rental/rent/${carid}`;
+        });
+    });
+</script>
+
+<script>
+    const deleteForm = document.getElementById('deleteForm');
+    document.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const carid = this.dataset.carid;
+            const carName = this.dataset.carname;
+            document.getElementById('deleteCarId').value = carid;
+            document.getElementById('carToDeleteName').textContent = carName;
+            deleteForm.action = `/car/remove/${carid}`;
+        });
+    });
+</script>
+
+{% endblock %}

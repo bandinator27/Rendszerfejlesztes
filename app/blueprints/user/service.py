@@ -16,7 +16,10 @@ class UserService:
     def user_register(request):
         try:
             if db.session.execute(select(Users).filter_by(email=request["email"])).scalar_one_or_none():
-                return False, "This email adress is already in use!"
+                return False, "This email address is already in use!"
+            
+            if db.session.execute(select(Users).filter_by(username=request["username"])).scalar_one_or_none():
+                return False, "This username is already in use!"
             
             address_data = request.pop("address")
             address = Addresses(**address_data)
@@ -24,12 +27,14 @@ class UserService:
             db.session.commit()
 
             request["address_id"] = address.id
-            request["password"] = generate_password_hash(request["password"])
+            request["password_salt"] = request["username"][::-1]
 
             user = Users(**request)
             db.session.add(user)
             db.session.commit()
-            UserService.add_user_role(user.id, "User")
+
+            new_user = db.session.execute(select(Users).filter_by(username=request["username"])).scalar_one_or_none()
+            UserService.add_user_role(new_user.id, "User")
 
         except Exception as ex:
             return False, f"Incorrect user data! Details: {ex}"
@@ -50,7 +55,7 @@ class UserService:
                     "error_type": "auth_failed"
                 }
      
-            if not user.check_password(request["password"]):
+            if not user.check_password(request["username"][::-1]+request["password"]):
                 return False, {
                     "message": "Incorrect password",
                     "error_type": "auth_failed"
@@ -78,9 +83,10 @@ class UserService:
 # --- Token generation
     @staticmethod
     def token_generate(user : Users):
+        print(f"DEBUG: Generating token for user {user.username}")
         payload = PayloadSchema()
         payload.user_id = user.id
-        payload.roles = RoleSchema().dump(obj=user.roles, many=True)
+        payload.roles = UserService.get_user_role_internal(user)
         payload.exp = int((datetime.now()+ timedelta(minutes=30)).timestamp())
         
         return jwt.encode({'alg': 'RS256'}, PayloadSchema().dump(payload), current_app.config['SECRET_KEY']).decode()
@@ -150,9 +156,17 @@ class UserService:
             return False, f"Database error! (remove_user_role) Details: {ex}"
 
     @staticmethod
-    def get_user_role(user_id):
-        roles = db.session.execute(select(Roles.role_name).filter(Roles.id==user_id)).scalars().all()
+    def get_user_role(user):
+        roles = db.session.execute(select(Roles.role_name).filter(Roles.id==user.id)).scalars().all()
         if not roles:
             return True, []
         role_dicts = [{"role_name": r} for r in roles]
         return True, RoleSchema(many=True).dump(role_dicts)
+    
+    @staticmethod
+    def get_user_role_internal(user):
+        roles = db.session.execute(select(Roles.role_name).filter(Roles.id==user.id)).scalars().all()
+        if not roles:
+            return []
+        role_dicts = [{"role_name": r} for r in roles]
+        return RoleSchema(many=True).dump(role_dicts)

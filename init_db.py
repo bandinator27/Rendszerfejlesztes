@@ -20,50 +20,55 @@ db.session.add_all([
         Addresses(city="Veszprém", street="Teszt utca 2", postalcode=8200)
     ])
 
-# --- ROLES test data
-db.session.add_all([
-        Roles(role_name="User"),
-        Roles(role_name="Clerk"),
-        Roles(role_name="Administrator")
-    ])
-
 # --- USERS test data
 db.session.add_all([
         Users(
             username="bela",
-            password=generate_password_hash("teszt123"),
-            password_salt="salty",
+            password=generate_password_hash("alebteszt123"),
+            password_salt="aleb",
             address_id=1,
             email="bela@berauto.hu",
             phone_number="+3670123456",
         ),
         Users(
             username="jani",
-            password=generate_password_hash("teszt123"),
-            password_salt="salty",
+            password=generate_password_hash("inajteszt123"),
+            password_salt="inaj",
             address_id=2,
             email="jani@berauto.hu",
             phone_number="+3670123457",
         ),
         Users(
             username="admin",
-            password=generate_password_hash("admin123"),
-            password_salt="salty",
+            password=generate_password_hash("nimdaadmin123"),
+            password_salt="nimda",
             address_id=1,
             email="admin@berauto.hu",
             phone_number="+36301234567",
         )])
-# role assignments
-bela = db.session.get(Users, 1)
-bela.roles.append(db.session.get(Roles, 1))  # TesztBela User
 
-jani = db.session.get(Users, 2)
-jani.roles.append(db.session.get(Roles, 1))  # TesztJani User
-jani.roles.append(db.session.get(Roles, 2))  # TesztJani Clerk
-
-admin = db.session.get(Users, 3)
-admin.roles.append(db.session.get(Roles, 1))  # admin Administrator
-admin.roles.append(db.session.get(Roles, 3))
+# --- ROLES test data
+db.session.add_all([
+        Roles(
+            id=1,
+            role_name="User"
+        ),
+        Roles(
+            id=2,
+            role_name="User"
+        ),
+        Roles(
+            id=2,
+            role_name="Clerk"
+        ),
+        Roles(
+            id=3,
+            role_name="User"
+        ),
+        Roles(
+            id=3,
+            role_name="Administrator"
+        )])
 
 # --- CARS test data
 db.session.add_all([

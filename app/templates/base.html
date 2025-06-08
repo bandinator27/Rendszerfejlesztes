@@ -24,6 +24,19 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/cars' %} active {% endif %}" href="/cars">Cars</a>
                     </li>
+                    {% if "Administrator" in session["role"] or "Clerk" in session["role"] %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/rentals/' %} active {% endif %}" href="/rental/list_rentals">Rentals</a>
+                    </li>
+                    {% endif %}
+                    {% if "Administrator" in session["role"] %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/admin/' %} active {% endif %}" href="/admin">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view">Users</a>
+                    </li>
+                    {% endif %}
                     {% if session.get("user") %}
                     <li class="nav-item">
                         <a class="nav-link" href="/account">Account</a>
@@ -37,19 +50,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == '/register/' %} active {% endif %}" href="/register">Register</a>
-                    </li>
-                    {% endif %}
-                    {% if session["role"] == "Administrator" or session["role"] == "Clerk" %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/rentals/' %} active {% endif %}" href="/rental/list_rentals">Rentals</a>
-                    </li>
-                    {% endif %}
-                    {% if session["role"] == "Administrator" %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/admin/' %} active {% endif %}" href="/admin">Admin</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/view">Users</a>
                     </li>
                     {% endif %}
                 </ul>

@@ -5,10 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey, Table, Column
 from typing import List
 
-UserRole = Table("userroles",Base.metadata,
-    Column("user_id", ForeignKey("Users.id")),
-    Column("role_id", ForeignKey("Roles.id"))
-)
+#UserRole = Table("userroles",Base.metadata,
+#    Column("user_id", ForeignKey("Users.id")),
+#    Column("role_id", ForeignKey("Roles.id"))
+#)
 
 class Users(db.Model):
     __tablename__ = "Users"
@@ -20,7 +20,6 @@ class Users(db.Model):
     address_id: Mapped[int] = mapped_column(ForeignKey("Addresses.id"))
     address = relationship("Addresses", backref="users")
     phone_number: Mapped[str] = mapped_column(String(32))
-    roles: Mapped[List["Roles"]] = relationship(secondary=UserRole, back_populates="users")
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
