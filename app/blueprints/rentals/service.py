@@ -78,12 +78,12 @@ class RentalsService:
 
 # --- APPROVE RENTAL
     @staticmethod
-    def approve_rental(carid, renterid):
+    def approve_rental(rentalid):
+        print(f"DEBUG: Approving rental with ID: {rentalid}")
         try:
             rental = db.session.execute(
                 select(Rentals).filter_by(
-                    carid=carid,
-                    renterid=renterid,
+                    rentalid=rentalid,
                     rentstatus="Pending"
                 )).scalar_one_or_none()
             if not rental:

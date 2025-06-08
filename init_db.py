@@ -11,7 +11,7 @@ from datetime import datetime
 
 app = create_app(config_class=Config)
 app.app_context().push()
-db.drop_all()  # Előző adatbázis törlése, ha van
+db.drop_all()  # Delete previous databse if there is one
 db.create_all()
 
 # --- ADDRESSES test data
@@ -34,7 +34,7 @@ db.session.add_all([
             password=generate_password_hash("teszt123"),
             password_salt="salty",
             address_id=1,
-            email="tesztbela@berauto.hu",
+            email="bela@berauto.hu",
             phone_number="+3670123456",
         ),
         Users(
@@ -42,7 +42,7 @@ db.session.add_all([
             password=generate_password_hash("teszt123"),
             password_salt="salty",
             address_id=2,
-            email="tesztjani@berauto.hu",
+            email="jani@berauto.hu",
             phone_number="+3670123457",
         ),
         Users(

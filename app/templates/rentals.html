@@ -7,6 +7,7 @@
     <table class="table table-striped table-hover w-auto">
         <thead>
             <tr>
+                <th>Rental</th>
                 <th>Car</th>
                 <th>Length</th>
                 <th>Address</th>
@@ -22,6 +23,7 @@
         <tbody>
             {% for rental in rentals %}
             <tr>
+                <td>#{{ rental.rentalid }}</td> 
                 <td>{{ rental.carid }}</td>
                 <td>{{ rental.rentduration }}</td>
                 <td>{{ rental.renteraddress }}</td>
@@ -32,14 +34,14 @@
                 {% if is_admin or is_clerk %}
                 <td>
                     {% if rental.rentstatus == "Pending" %}
-                    <button class="btn btn-success btn-sm approve-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">
-                        Approve
-                    </button>
+                    <form action="{{ url_for('main.rentals.approve_rental', rentalid=rental.rentalid) }}" method="post">
+                        <button class="btn btn-success btn-sm approve-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">Approve</button>
+                    </form>
                     {% endif %}
                     {% if rental.rentstatus == "Rented" %}
-                    <button class="btn btn-danger btn-sm stop-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">
-                        Stop
-                    </button>
+                    <form action="{{ url_for('main.rentals.stop_rental', rentalid=rental.rentalid) }}" method="post">
+                        <button class="btn btn-danger btn-sm stop-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">Stop</button>
+                    </form>
                     {% endif %}
                 </td>
                 {% endif %}
@@ -48,54 +50,5 @@
         </tbody>
     </table>
 </div>
-<script>
-    // Approve rental
-    document.querySelectorAll('.approve-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const carid = this.dataset.carid;
-            const renterid = this.dataset.renterid;
-
-            fetch(`/rental/approve/${carid}/${renterid}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        window.location.reload();
-                    }
-                })
-                .catch(error => alert('Error: ' + error));
-        });
-    });
-
-    // Stop rental
-    document.querySelectorAll('.stop-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const carid = this.dataset.carid;
-            const renterid = this.dataset.renterid;
-
-            fetch(`/rental/stop/${carid}/${renterid}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        window.location.reload();
-                    }
-                })
-                .catch(error => alert('Error: ' + error));
-        });
-    });
-</script>
 
 {% endblock %}
