@@ -43,8 +43,20 @@ def login():
                         })
         
         print(login_request.json())
-        flash(f"Logging in.")
-        return redirect("/")
+
+        login_response = login_request.json()
+        if not login_response["token"]:
+            flash("Wrong username or password")
+            return redirect("/login")
+        
+        session['user'] = login_response["username"]
+        session['role'] = "Administrator"
+
+        resp = make_response(redirect(url_for('main.home')))
+        resp.set_cookie('access_token', login_response["token"], httponly=True, secure=False, samesite='Lax')
+            
+        flash("You're signed in!", "info")
+        return resp
 
     return render_template('login.html', name='Pythonblog', form=form)
 
