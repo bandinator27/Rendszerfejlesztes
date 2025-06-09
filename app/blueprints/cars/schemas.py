@@ -20,3 +20,8 @@ class CarsSchema(Schema):
     kmcount = fields.Integer()
     enginetype = fields.String()
     extras = fields.String()
+    image_url = fields.String()
+
+class CarsFilterSchema(Schema):
+    filter_type = fields.String()
+    filterValue = fields.String()

@@ -24,6 +24,59 @@ class CarsService:
         except Exception as ex:
             return False, f"Database or server error! Details: {ex}"
         return True, CarsSchema().dump(cars)
+    
+    @staticmethod
+    def get_car_data_filtered(request):
+        filter_type = request['filter_type']
+        filterValue = request['filterValue']
+
+        try:
+            query = Cars.query
+
+            if filter_type:
+                if filter_type == "Numberplate":
+                    query = query.filter(Cars.numberplate.ilike(f'%{filterValue}%'))
+                elif filter_type == "Manufacturer":
+                    query = query.filter(Cars.manufacturer.ilike(f'%{filterValue}%'))
+                elif filter_type == "Model":
+                    query = query.filter(Cars.model.ilike(f'%{filterValue}%'))
+                elif filter_type == "Color":
+                    query = query.filter(Cars.color.ilike(f'%{filterValue}%'))
+                elif filter_type == "Price (Maximum)":
+                    try:
+                        max_price = float(filterValue)
+                        query = query.filter(Cars.price <= max_price)
+                    except ValueError:
+                        query = Cars.query.all()
+                elif filter_type == "Price (Minimum)":
+                    try:
+                        min_price = float(filterValue)
+                        query = query.filter(Cars.price >= min_price)
+                    except ValueError:
+                        query = Cars.query.filter(False)
+                elif filter_type == "Mileage (Maximum)":
+                    try:
+                        max_km = int(filterValue)
+                        query = query.filter(Cars.kmcount <= max_km)
+                    except ValueError:
+                        query = Cars.query.filter(False)
+                elif filter_type == "Mileage (Minimum)":
+                    try:
+                        min_km = int(filterValue)
+                        query = query.filter(Cars.kmcount >= min_km)
+                    except ValueError:
+                        query = Cars.query.filter(False)
+                else:
+                    pass
+
+            if not filterValue or not filter_type:
+                cars_list = Cars.query.all()
+            else:
+                cars_list = query.all()
+
+        except Exception as ex:
+            return False, f"Database or server error! Details: {ex}"
+        return True, CarsSchema().dump(cars_list, many=True)
 
 # --- List available cars
     @staticmethod
@@ -87,7 +140,7 @@ class CarsService:
             select(Rentals).filter(
                 Rentals.carid == cid,
                 Rentals.rentstatus.in_(["Rented", "Pending"])
-            )).scalar_one_or_none()
+            )).scalars().all()
         if active_rental:
             return False, "Car cannot be deleted: currently rented or pending rental."
 
