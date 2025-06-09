@@ -33,13 +33,14 @@ def user_register(json_data):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-# --- MYROLES
-@user_bp.get('/myroles')
+# --- GET USER ROLES
+@user_bp.get('/get/roles/<int:uid>')
 @user_bp.doc(tags=["user"])
 @user_bp.output(RoleSchema(many=True))
 @user_bp.auth_required(auth)
-def user_list_roles():
-    success, response = UserService.get_user_role(auth.current_user.get("user_id"))
+@role_required(["Administrator"])
+def user_list_roles(uid):
+    success, response = UserService.get_user_role(uid)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
@@ -47,7 +48,7 @@ def user_list_roles():
 @user_bp.get('/list_users')
 @user_bp.doc(tags=["user"])
 @user_bp.auth_required(auth)
-@role_required(["Clerk", "Administrator"])
+@role_required(["Administrator"])
 @user_bp.output(UserResponseSchema(many = True))
 def user_view():
     success, response = UserService.list_users()
@@ -55,12 +56,11 @@ def user_view():
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
-@user_bp.get('/get_user_data/<string:uid>')
+@user_bp.get('/get/<int:uid>')
 @user_bp.doc(tags=["user"])
 @user_bp.output(UserResponseSchema())
 @user_bp.auth_required(auth)
-#@role_required(["User"])
-#@role_required(["Clerk", "Administrator"])
+@role_required(["Administrator", "Clerk"])
 def get_user_data(uid):
     success, response = UserService.get_user_data(uid)
     if success:
@@ -72,7 +72,7 @@ def get_user_data(uid):
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.auth_required(auth)
-@role_required(["User", "Clerk", "Administrator"])
+@role_required(["Clerk", "Administrator"])
 def set_user_data(uid, json_data):
     current_user_id = auth.current_user.get("user_id")
     if current_user_id != uid and not set(auth.current_user.get("roles", [])) & {"Administrator"}:

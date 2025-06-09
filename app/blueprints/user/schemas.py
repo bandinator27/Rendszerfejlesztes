@@ -23,6 +23,7 @@ class UserResponseSchema(Schema):
     username = fields.String()
     email = fields.String()
     address = fields.Nested(AddressSchema)
+    phone_number = fields.String()
     token = fields.String()
 
 class UserLoginSchema(Schema):

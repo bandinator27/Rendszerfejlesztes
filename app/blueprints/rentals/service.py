@@ -106,7 +106,6 @@ class RentalsService:
 # --- STOP RENTAL
     @staticmethod
     def stop_rental(rentalid):
-        print("start of stop_rental")
         try:
             rental = db.session.get(Rentals, rentalid)
             if rental is None:
