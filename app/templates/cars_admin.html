@@ -31,7 +31,7 @@
 </div>
 
 {# Add new car modal #}
-<div class="modal fade" id="addcar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<div class="modal fade" id="addcar" data-bs-backdrop="static" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -95,7 +95,8 @@
     </div> <!--modal-dialog-->
 </div> <!--modal-->
 
-    {% for row_items in values|batch(4) %}
+{# Cars listing #}
+    {% for row_items in cars_list|batch(4) %}
 <div class="row row-cols-1 row-cols-md-4 pb-4">
     {% for item in row_items %}
     <div class="col">

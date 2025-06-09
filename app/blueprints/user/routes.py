@@ -6,7 +6,7 @@ from app.blueprints.user.schemas import RoleSchema
 from apiflask import HTTPError
 from app.blueprints.user.service import UserService
 from app.extensions import auth
-from flask import redirect, url_for
+from flask import redirect, url_for, request, flash
 
 # @user_bp.route('/')
 # def index():
@@ -67,6 +67,7 @@ def get_user_data(uid):
         return response, 200
     raise HTTPError(message=response, status_code=400)
 
+# --- EDIT USER DATA
 @user_bp.post('/set_user_data/<int:uid>')
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserRequestSchema, location="json")
@@ -80,6 +81,29 @@ def set_user_data(uid, json_data):
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
+
+@user_bp.post('/edit/<int:uid>')
+@user_bp.doc(tags=["user"])
+def edit_user_data(uid):
+    form = request.form
+    json_data = {
+        "username": form.get("username"),
+        "email": form.get("email"),
+        "password": form.get("password"),
+        "phone_number": form.get("phone_number"),
+        "address": {
+            "postalcode": form.get("postalcode"),
+            "city": form.get("city"),
+            "street": form.get("street")
+        }
+    }
+    success, response = UserService.set_user_data(uid, json_data)
+    if success:
+        flash(response, "success")
+        return redirect(url_for("main.account"))
+    else:
+        flash(response, "warning")
+        return redirect(url_for("main.account"))
 
 # @user_bp.post('/remove_role/<int:uid>')
 # @user_bp.doc(tags=["user"])

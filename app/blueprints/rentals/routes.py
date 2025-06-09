@@ -1,4 +1,4 @@
-﻿from flask import request, redirect, url_for, flash, current_app, render_template, session
+﻿from flask import request, redirect, url_for, flash, current_app, render_template
 from apiflask import HTTPError
 from app.models.rentals import Rentals
 from app.blueprints.rentals import rental_bp
@@ -238,7 +238,6 @@ def stop_rental(rentalid):
 @rental_bp.route('/stop/<int:rentalid>', methods=["POST"])
 @rental_bp.doc(tags=["rentals"])
 def stop_rental_form(rentalid):
-    print(rentalid)
     try:
         token = request.cookies.get('access_token')
         if not token:

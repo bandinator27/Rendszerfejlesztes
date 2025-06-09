@@ -17,7 +17,8 @@ db.create_all()
 # --- ADDRESSES test data
 db.session.add_all([
         Addresses(city="Veszprém", street="Teszt utca 1", postalcode=8200),
-        Addresses(city="Veszprém", street="Teszt utca 2", postalcode=8200)
+        Addresses(city="Veszprém", street="Kórház utca 2", postalcode=8200),
+        Addresses(city="Veszprém", street="Egyetem u. 4", postalcode=8200)
     ])
 
 # --- USERS test data
@@ -42,7 +43,7 @@ db.session.add_all([
             username="admin",
             password=generate_password_hash("nimdaadmin123"),
             password_salt="nimda",
-            address_id=1,
+            address_id=3,
             email="admin@berauto.hu",
             phone_number="+36301234567",
         )])

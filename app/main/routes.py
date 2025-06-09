@@ -9,7 +9,6 @@ from werkzeug.security import generate_password_hash
 from app.forms.loginform import LoginForm
 from app.forms.registerform import RegisterForm
 import requests
-from authlib.jose import jwt
 
 @main_bp.route("/")
 def home():
@@ -32,8 +31,13 @@ def login():
                         })
 
         login_response = login_request.json()
+
+        print(f"Request data: {data}")
+        print(f"Login API Status Code: {login_request.status_code}")
+        print(f"Login API Response Text: {login_request.text}")
+
         if not login_response["token"]:
-            flash("Wrong username or password")
+            flash("Wrong username or password!", "danger")
             return redirect("/login")
         
         session['user'] = login_response["username"]
@@ -53,7 +57,7 @@ def login():
             print('User yaay!')
 
         resp = make_response(redirect(url_for('main.home')))
-        resp.set_cookie('access_token', login_response["token"], httponly=True, secure=False, samesite='Lax')
+        resp.set_cookie('access_token', login_response["token"])
             
         flash("You're signed in!", "info")
         return resp
@@ -250,9 +254,14 @@ def rentals():
            if not data:
                return redirect(url_for("main.home"))
            
-           rentals_list = requests.get('http://localhost:5000/rental/view_rentals_user', headers=set_auth_headers(token))
-           return render_template('rentals2.html', userAccount=found_user, rentals_list=rentals_list.json())
-       else:
+            rentals_list = requests.get('http://localhost:5000/rental/view_rentals_user', headers=set_auth_headers(token))
+            numberplates = []
+            for rental in rentals_list.json():
+               car_data = requests.get('http://localhost:5000/car/view/'+str(rental["carid"]), headers=set_auth_headers(token))
+               numberplates.append(car_data.json()['numberplate'])
+
+            return render_template('account.html', userAccount=found_user, rentals_list=rentals_list.json(), numberplates=numberplates)
+        else:
            return redirect(url_for("main.home"))
    else:
        return redirect(url_for("main.home"))

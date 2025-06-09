@@ -1,14 +1,8 @@
-from app.extensions import db, Base
+from app.extensions import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import ForeignKey, Table, Column
-from typing import List
-
-#UserRole = Table("userroles",Base.metadata,
-#    Column("user_id", ForeignKey("Users.id")),
-#    Column("role_id", ForeignKey("Roles.id"))
-#)
+from sqlalchemy import ForeignKey
 
 class Users(db.Model):
     __tablename__ = "Users"

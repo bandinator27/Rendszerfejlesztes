@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from authlib.jose import jwt
 from flask import current_app
 from sqlalchemy import select
-from werkzeug.security import generate_password_hash
 
 class UserService:
 

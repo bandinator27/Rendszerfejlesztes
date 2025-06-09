@@ -13,3 +13,14 @@ body {
 .nav-link:hover {
     text-decoration: underline;
 }
+
+h1:hover .edit-icon {
+    opacity: 1;
+}
+.edit-icon {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.edit-icon:hover {
+    opacity: 1;
+}
