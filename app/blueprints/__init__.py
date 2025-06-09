@@ -54,10 +54,12 @@ def role_required(roles):
     def wrapper(fn):
         @wraps(fn)
         def decorated_function(*args, **kwargs):
-            user_roles = [item["name"] for item in auth.current_user.get("roles")]
+            user_roles = auth.current_user.get("roles")
+            print(user_roles)
             for role in roles:
-                if role in user_roles:
-                    return fn(*args, **kwargs)        
+                for user_role in user_roles:
+                    if role in user_role['role_name']:
+                        return fn(*args, **kwargs)        
             raise HTTPError(message="Access denied! (role_required)", status_code=403)
         return decorated_function
     return wrapper

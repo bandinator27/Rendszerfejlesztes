@@ -1,5 +1,5 @@
 ﻿from app.blueprints.cars import car_bp
-from app.blueprints.cars.schemas import CarsSchema
+from app.blueprints.cars.schemas import CarsSchema, CarsFilterSchema
 from apiflask import HTTPError
 from app.blueprints.cars.service import CarsService
 from app.extensions import auth, db
@@ -143,6 +143,17 @@ def add_car_form():
 @role_required(["Administrator"])
 def remove_car(cid):
     success, response = CarsService.remove_car(cid)
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+# --- Filter car
+@car_bp.post('/filter/')
+@car_bp.doc(tags=["car"])
+@car_bp.input(CarsFilterSchema, location="json")
+@car_bp.output(CarsSchema(many=True))
+def filter_car(json_data):
+    success, response = CarsService.get_car_data_filtered(json_data)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)

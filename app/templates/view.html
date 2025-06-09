@@ -11,15 +11,17 @@
                 <th>Email</th>
                 <th>Address</th>
                 <th>Phone number</th>
+                <th>Roles</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in values %}
+            {% for user in users %}
             <tr>
-                <td class="px-2">{{ item.username }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.address.postalcode }} {{ item.address.city }}, {{ item.address.street }}</td>
-                <td>{{ item.phone_number }}</td>
+                <td class="px-2">{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.address.postalcode }} {{ user.address.city }}, {{ user.address.street }}</td>
+                <td>{{ user.phone_number }}</td>
+                <td>{{roles[loop.index0]}}</td>
             </tr>
             {% endfor %}
         </tbody>

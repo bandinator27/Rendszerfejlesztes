@@ -44,7 +44,21 @@ def view_rentals():
     if not success:
         flash(rentals, "danger")
         rentals = []
-    return render_template('rentals.html', rentals=rentals, is_admin=is_admin, is_clerk=is_clerk)
+
+    import requests
+    from app.blueprints import set_auth_headers
+    numberplates = []
+    for rental in rentals:
+        car_data = requests.get('http://localhost:5000/car/view/'+str(rental["carid"]), headers=set_auth_headers(token))
+        numberplates.append(car_data.json()['numberplate'])
+
+    usernames = []
+    for rental in rentals:
+        user_data = requests.get('http://localhost:5000/user/get/'+str(rental["renterid"]), headers=set_auth_headers(token))
+        print(user_data.json())
+        usernames.append(user_data.json()['username'])
+
+    return render_template('rentals.html', rentals=rentals, is_admin=is_admin, is_clerk=is_clerk, numberplates=numberplates, usernames=usernames)
 
 # --- View rentals for a user
 @rental_bp.get('/view_rentals_user')

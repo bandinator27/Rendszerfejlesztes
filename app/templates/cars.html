@@ -24,38 +24,38 @@
     </div>
 </div>
 
-    {% for row_items in values|batch(4) %}
+    {% for row_items in cars_list|batch(4) %}
 <div class="row row-cols-1 row-cols-md-4 pb-4">
-    {% for item in row_items %}
+    {% for car in row_items %}
     <div class="col">
         <div class="card h-100 text-bg-light border-dark">
-            {% set url = "/images/" + item.image_url %}
+            {% set url = "/images/" + car.image_url %}
             <img src="{{ url_for('static', filename=url) }}" class="card-img-top" alt="Car image">
             <div class="card-body">
-                <h5 class="card-title">{{ item.manufacturer }} {{ item.model }} - {{ item.year }}</h5>
-                <p class="card-text">{{ item.numberplate }}</p>
-                <p class="card-text">{{ item.color }} with {{ item.interior }} interior</p>
-                <p class="card-text">Extras: {{ item.extras }}</p>
-                <p class="card-text">Mileage: {{ item.kmcount | thousands_separator }} km</p>
-                <p class="card-text">{{ item.enginetype }}, {{ item.power }} HP {{ item.fueltype }} engine </p>
+                <h5 class="card-title">{{ car.manufacturer }} {{ car.model }} - {{ car.year }}</h5>
+                <p class="card-text">{{ car.numberplate }}</p>
+                <p class="card-text">{{ car.color }} with {{ car.interior }} interior</p>
+                <p class="card-text">Extras: {{ car.extras }}</p>
+                <p class="card-text">Mileage: {{ car.kmcount | thousands_separator }} km</p>
+                <p class="card-text">{{ car.enginetype }}, {{ car.power }} HP {{ car.fueltype }} engine </p>
             </div>
             <div class="row text-center align-items-center g-0 pb-2">
                 <div class="col-md-4 separator">
                     <i class="bi bi-person fs-4 d-block"></i>
-                    <p class="card-text mb-0">{{ item.seats }}</p>
+                    <p class="card-text mb-0">{{ car.seats }}</p>
                 </div>
                 <div class="col-md-4 separator">
                     <i class="bi bi-speedometer2 fs-4 d-block"></i>
-                    <p class="card-text mb-0">{{ item.topspeed }} km/h</p>
+                    <p class="card-text mb-0">{{ car.topspeed }} km/h</p>
                 </div>
                 <div class="col-md-4">
                     <i class="bi bi-cash fs-4 d-block"></i>
-                    <p class="card-text mb-0">${{ item.price }}/day</p>
+                    <p class="card-text mb-0">${{ car.price }}/day</p>
                 </div>
             </div>
 
             <div class="card-footer">
-                <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button>
+                <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ car.carid }}">Rent</button>
             </div>
         </div>
     </div>

@@ -8,7 +8,8 @@
         <thead>
             <tr>
                 <th>Rental</th>
-                <th>Car</th>
+                <th>Numberplate</th>
+                <th>Username</th>
                 <th>Length</th>
                 <th>Address</th>
                 <th>Phone number</th>
@@ -25,8 +26,9 @@
             {% for rental in rentals %}
             <tr>
                 <td>#{{ rental.rentalid }}</td>
-                <td>{{ rental.carid }}</td>
-                <td>{{ rental.rentduration }}</td>
+                <td>{{numberplates[loop.index0]}}</td>
+                <td>{{usernames[loop.index0]}}</td>
+                <td>{{ rental.rentduration }} days</td>
                 <td>{{ rental.renteraddress }}</td>
                 <td>{{ rental.renterphonenum }}</td>
                 <td>{{ rental.rentprice }}</td>

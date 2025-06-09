@@ -93,7 +93,7 @@ class UserService:
    
     @staticmethod
     def get_user_data(user_id):
-        user = db.session.execute(select(Users).filter(Users.email == user_id)).scalar_one_or_none()
+        user = db.session.execute(select(Users).filter(Users.id == user_id)).scalar_one_or_none()
         if user is None:
             return False, "User not found! (get_user_data)"
         return True, UserResponseSchema().dump(user)
@@ -156,8 +156,8 @@ class UserService:
             return False, f"Database error! (remove_user_role) Details: {ex}"
 
     @staticmethod
-    def get_user_role(user):
-        roles = db.session.execute(select(Roles.role_name).filter(Roles.id==user.id)).scalars().all()
+    def get_user_role(uid):
+        roles = db.session.execute(select(Roles.role_name).filter(Roles.id==uid)).scalars().all()
         if not roles:
             return True, []
         role_dicts = [{"role_name": r} for r in roles]
