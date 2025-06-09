@@ -13,7 +13,35 @@
     </div>
     <div class="row pt-4">
         <h1>My rentals</h1>
-        <p>todo</p>
+        <div class="row pt-4 justify-content-center">
+            <p class="text-center fs-3 pb-4">Current rentals</p>
+            <table class="table table-striped table-hover w-auto">
+                <thead>
+                    <tr>
+                        <th>Numberplate</th>
+                        <th>Rent duration (days)</th>
+                        <th>Address</th>
+                        <th>Phone number</th>
+                        <th>Price / day</th>
+                        <th>Start date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="main">
+                    {% for rent in rentals_list %}
+                    <tr>
+                        <td>{{numberplates[loop.index0]}}</td>
+                        <td>{{rent.rentduration}}</td>
+                        <td>{{rent.renteraddress}}</td>
+                        <td>{{rent.renterphonenum}}</td>
+                        <td>{{rent.rentprice}}</td>
+                        <td>{{rent.rentstart}}</td>
+                        <td>{{rent.rentstatus}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

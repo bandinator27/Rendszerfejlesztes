@@ -2,11 +2,35 @@
 {% block title %} All cars {% endblock %}
 {% block content %}
 
-<div class="row pt-4">
+<div class="row justify-content-center pb-4">
     <button type="button" class="btn btn-primary w-auto" data-bs-toggle="modal" data-bs-target="#addcar">
         Add new car
     </button>
 </div>
+
+<div class="row justify-content-center pb-4">
+    <div class="col-lg-5 my-6">
+        <form action="{{ url_for('main.admin_page') }}" method="get">
+            <div class="input-group">
+                <select class="form-select" name="type">
+                    <option>Numberplate</option>
+                    <option>Manufacturer</option>
+                    <option>Model</option>
+                    <option>Color</option>
+                    <option>Price (Maximum)</option>
+                    <option>Price (Minimum)</option>
+                    <option>Mileage (Maximum)</option>
+                    <option>Mileage (Minimum)</option>
+                </select>
+                <input type="text" name="cid" class="form-control" placeholder="filter by this value" required>
+                <button class="btn btn-outline-light" type="submit">Show</button>
+                <a href="{{ url_for('main.admin_page') }}" class="btn btn-outline-light">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Add new car modal #}
 <div class="modal fade" id="addcar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -71,56 +95,33 @@
     </div> <!--modal-dialog-->
 </div> <!--modal-->
 
-
-<div class="row justify-content-center mb-4">
-    <div class="col-lg-6 col-sm-6 my-6">
-        <form action="{{ url_for('main.cars') }}" method="get">
-            <div class="input-group">
-                <select class="form-select" name="type">
-                    <option>Numberplate</option>
-                    <option>Manufacturer</option>
-                    <option>Model</option>
-                    <option>Color</option>
-                    <option>Price (Maximum)</option>
-                    <option>Price (Minimum)</option>
-                    <option>Mileage (Maximum)</option>
-                    <option>Mileage (Minimum)</option>
-                </select>
-                <input type="text" name="cid" class="form-control" placeholder="filter by this value" required>
-                <button class="btn btn-outline-light" type="submit">Show</button>
-                <a href="{{ url_for('main.cars') }}" class="btn btn-outline-light">Reset</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-    {% for row_items in values|batch(4) %}
+    {% for row_items in cars_list|batch(4) %}
 <div class="row row-cols-1 row-cols-md-4 pb-4">
-    {% for item in row_items %}
+    {% for car in row_items %}
     <div class="col">
         <div class="card h-100 text-bg-light border-dark">
-            {% set url = "/images/" + item.image_url %}
+            {% set url = "/images/" + car.image_url %}
             <img src="{{ url_for('static', filename=url) }}" class="card-img-top" alt="Car image">
             <div class="card-body">
-                <h5 class="card-title">{{ item.manufacturer }} {{ item.model }} - {{ item.year }}</h5>
-                <p class="card-text">{{ item.numberplate }}</p>
-                <p class="card-text">{{ item.color }} with {{ item.interior }} interior</p>
-                <p class="card-text">Extras: {{ item.extras }}</p>
-                <p class="card-text">Mileage: {{ item.kmcount | thousands_separator }} km</p>
-                <p class="card-text">{{ item.enginetype }}, {{ item.power }} HP {{ item.fueltype }} engine </p>
+                <h5 class="card-title">{{ car.manufacturer }} {{ car.model }} - {{ car.year }}</h5>
+                <p class="card-text">{{ car.numberplate }}</p>
+                <p class="card-text">{{ car.color }} with {{ car.interior }} interior</p>
+                <p class="card-text">Extras: {{ car.extras }}</p>
+                <p class="card-text">Mileage: {{ car.kmcount | thousands_separator }} km</p>
+                <p class="card-text">{{ car.enginetype }}, {{ car.power }} HP {{ car.fueltype }} engine </p>
             </div>
             <div class="row text-center align-items-center g-0 pb-2">
                 <div class="col-md-4 separator">
                     <i class="bi bi-person fs-4 d-block"></i>
-                    <p class="card-text mb-0">{{ item.seats }}</p>
+                    <p class="card-text mb-0">{{ car.seats }}</p>
                 </div>
                 <div class="col-md-4 separator">
                     <i class="bi bi-speedometer2 fs-4 d-block"></i>
-                    <p class="card-text mb-0">{{ item.topspeed }} km/h</p>
+                    <p class="card-text mb-0">{{ car.topspeed }} km/h</p>
                 </div>
                 <div class="col-md-4">
                     <i class="bi bi-cash fs-4 d-block"></i>
-                    <p class="card-text mb-0">${{ item.price }}/day</p>
+                    <p class="card-text mb-0">${{ car.price }}/day</p>
                 </div>
             </div>
 
@@ -129,13 +130,13 @@
                 <button type="button" class="btn btn-danger btn-sm w-100 del-btn"
                         data-bs-toggle="modal"
                         data-bs-target="#deleteConfirmationPopup"
-                        data-carid="{{ item.carid }}"
-                        data-carname="{{ item.manufacturer }} {{ item.model }} - {{ item.numberplate }}"
+                        data-carid="{{ car.carid }}"
+                        data-carname="{{ car.manufacturer }} {{ car.model }} - {{ car.numberplate }}"
                         id="">
                     Delete
                 </button>
                 {% else %}
-                <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ item.carid }}">Rent</button>
+                <button type="button" class="btn btn-secondary btn-sm rent-btn w-100" data-bs-toggle="modal" data-bs-target="#rentModal" data-carid="{{ car.carid }}">Rent</button>
                 {% endif %}
             </div>
         </div>
