@@ -134,7 +134,58 @@ def add_car_form():
         return redirect(url_for('main.admin_page'))
     
     flash("Failed to add car!", "danger")
-    return render_template("admin.html")
+    return redirect(url_for('main.admin_page'))
+
+@car_bp.route('/edit/<int:cid>', methods=["POST"])
+@car_bp.doc(tags=["car"])
+def edit_car_form(cid):
+    form_data = request.form.to_dict()
+    #form_data['rentable'] = 1
+    token = request.cookies.get('access_token')
+    if not token:
+        flash("Looks like you're not signed in. Sign in first!", "danger")
+        return redirect(url_for('main.login'))
+    try:
+        public_key = current_app.config['PUBLIC_KEY']
+        claims = jwt.decode(token, public_key)
+        claims.validate()
+    except Exception as ex:
+        flash("Unauthorized: invalid token. Sign in again!", "danger")
+        return redirect(url_for('main.logout'))
+
+    user_roles = [r['role_name'] for r in claims.get('roles', [])]
+    if "Administrator" not in user_roles:
+        flash("You don't have permission to add a car!", "warning")
+        return redirect(url_for('main.home'))
+
+    file = request.files['car_image']
+    if file.filename == '':
+        flash("Select an image!", "warning")
+        return redirect(url_for('main.admin_page'))
+
+    # Validate the file type and save it
+    if file and allowed_file(file.filename):
+        original_filename = secure_filename(file.filename)
+        file_extension = original_filename.rsplit('.', 1)[1].lower()
+        unique_filename = str(uuid.uuid4().hex) + '.' + file_extension
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
+        try:
+            file.save(filepath)
+            form_data['image_url'] = unique_filename
+        except Exception as e:
+            flash(f"Error saving image: {e}", "danger")
+            return redirect(url_for('main.admin_page'))
+    else:
+        flash("Invalid image file type. Only PNG, JPG, JPEG is allowed.", "warning")
+        return redirect(url_for('main.admin_page'))
+
+    success, response = CarsService.set_car_data(cid, form_data)
+    if success:
+        flash("Car edited successfully!", "success")
+        return redirect(url_for('main.admin_page'))
+    
+    flash("Failed to add car!", "danger")
+    return redirect(url_for('main.admin_page'))
 
 # --- Delete a car
 @car_bp.delete('/api/remove/<int:cid>')

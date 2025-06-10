@@ -93,9 +93,9 @@ class CarsService:
         try:
             car = db.session.get(Cars, cid)
             if car:
-                car.numberplate = request["numberplate"]
                 car.rentable = request["rentable"]
                 car.price = request["price"]
+                car.year = request["year"]
                 car.manufacturer = request["manufacturer"]
                 car.model = request["model"]
                 car.color = request["color"]
@@ -110,6 +110,7 @@ class CarsService:
                 car.kmcount = request["kmcount"]
                 car.enginetype = request["enginetype"]
                 car.extras = request["extras"]
+                car.image_url = request["image_url"]
                 db.session.commit()
                 return True, f"ID:{cid} car modifications saved!"
                     
@@ -139,10 +140,10 @@ class CarsService:
         active_rental = db.session.execute(
             select(Rentals).filter(
                 Rentals.carid == cid,
-                Rentals.rentstatus.in_(["Rented", "Pending"])
+                Rentals.rentstatus.in_(["Rented", "Pending", "Returned"])
             )).scalars().all()
         if active_rental:
-            return False, "Car cannot be deleted: currently rented or pending rental."
+            return False, "Car cannot be deleted: currently rented, pending rental or needed for logging reasons."
 
         try:
             # 3. Delete the car
