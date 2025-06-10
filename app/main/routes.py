@@ -97,28 +97,6 @@ def register():
 
     return render_template('register.html', form=form)
 
-# --- List users for testing
-@main_bp.route("/view/")
-def view():
-    if session["user"]:
-        if "Administrator" in session["role"]:
-            token = request.cookies.get('access_token')
-            users = requests.get('http://localhost:5000/user/list_users', headers=set_auth_headers(token))
-
-            roles = []
-            for user in users.json():
-               user_data = requests.get('http://localhost:5000/user/get/roles/'+str(user["id"]), headers=set_auth_headers(token))
-               data = ''
-               for role in user_data.json():
-                   if not len(data) < 1:
-                       data = data + ', ' + role['role_name']
-                   else:
-                       data = role['role_name']
-               roles.append(data)
-
-            return render_template('view.html', users=users.json(), roles=roles)
-    return redirect(url_for("main.home")) 
-
 # --- List cars
 @main_bp.route('/cars', methods=['GET'], strict_slashes=False)
 def cars():

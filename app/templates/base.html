@@ -34,7 +34,7 @@
                         <a class="nav-link {% if request.path == '/admin/' %} active {% endif %}" href="/admin">Admin</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/view/' %} active {% endif %}" href="/view">Users</a>
+                        <a class="nav-link {% if request.path == '/user/view_users' %} active {% endif %}" href="/user/view_users">Users</a>
                     </li>
                     {% endif %}
                     {% if session.get("user") %}

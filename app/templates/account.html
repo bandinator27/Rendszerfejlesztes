@@ -30,6 +30,7 @@
                 <th>Price</th>
                 <th>Start date</th>
                 <th>Status</th>
+                <th>Invoice</th>
             </tr>
         </thead>
         <tbody>
@@ -42,6 +43,11 @@
                 <td>{{rent.rentprice}}$</td>
                 <td>{{rent.rentstart[:10]}}</td>
                 <td>{{rent.rentstatus}}</td>
+                {% if rent.rentstatus != "Pending" %}
+                <td><a class="nav-link pe-4" href="{{ url_for('main.user.invoice', cid=rent.rentalid) }}"><i class="bi bi-box-arrow-down fs-4"></i></a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>

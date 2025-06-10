@@ -34,3 +34,7 @@ class PayloadSchema(Schema):
     user_id = fields.Integer()
     roles = fields.List(fields.Nested(RoleSchema))
     exp = fields.Integer()
+
+class UserFilterSchema(Schema):
+    filter_type = fields.String()
+    filterValue = fields.String()

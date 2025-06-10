@@ -4,7 +4,7 @@ from app.models.rentals import Rentals
 from app.blueprints import set_auth_headers, verify_token
 from app.blueprints.rentals import rental_bp
 from app.blueprints.rentals.service import RentalsService
-from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
+from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema, RentalsFilterSchema
 from app.models.users import Users
 from app.models.cars import Cars
 from app.extensions import auth
@@ -21,8 +21,20 @@ import requests
 @rental_bp.auth_required(auth)
 @role_required(["Clerk", "Administrator"])
 def view_rentals_api():
-    print('called')
     success, response = RentalsService.view_rentals()
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+# --- View rentals
+@rental_bp.post('/filter')
+@rental_bp.doc(tags=["rentals"])
+@rental_bp.input(RentalsFilterSchema, location="json")
+@rental_bp.output(RentalsSchema(many = True))
+@rental_bp.auth_required(auth)
+@role_required(["Clerk", "Administrator"])
+def filter_rentals(json_data):
+    success, response = RentalsService.filter_rentals(json_data)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
@@ -38,9 +50,24 @@ def view_rentals():
     if not 'Administrator' in session['role'] and not 'Clerk' in session['role']:
         flash("You don't have permission to view this!", "danger")
         return redirect(url_for('main.home'))
-    
+
+    cid = request.args.get('cid', type=str)
+    filter_type = request.args.get('type', type=str)
+
+    if not filter_type:
+        filter_type = 'default'
+
+    if not cid:
+        cid = 'default'
+
     token = request.cookies.get('access_token')
-    response = requests.get('http://localhost:5000/rental/api/view_rentals', headers=set_auth_headers(token))
+    #response = requests.get('http://localhost:5000/rental/api/view_rentals', headers=set_auth_headers(token))
+    response = requests.post('http://localhost:5000/rental/filter',
+    json={
+        'filter_type': filter_type,
+        'filterValue': cid
+    }, headers=set_auth_headers(token))
+
     rentals = response.json()
 
     if response.status_code != 200:
@@ -66,6 +93,17 @@ def view_rentals():
 @rental_bp.auth_required(auth)
 def view_rentals_user():
     success, response = RentalsService.view_rentals_user(auth.current_user.get("user_id"))
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
+
+# --- Get rental for a user
+@rental_bp.get('/get/user/<int:cid>')
+@rental_bp.doc(tags=["rentals"])
+@rental_bp.output(RentalsSchema())
+@rental_bp.auth_required(auth)
+def rental_get_user(cid):
+    success, response = RentalsService.rental_get_user(auth.current_user.get("user_id"), cid)
     if success:
         return response, 200
     raise HTTPError(message=response, status_code=400)
