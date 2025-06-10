@@ -19,34 +19,42 @@
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %} active {% endif %}" href="/">Home</a>
+                        <a class="nav-link animated-link {% if request.path == '/' %}active{% endif %}" href="/"><i class="bi bi-house"></i>
+                        Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/cars' %} active {% endif %}" href="/cars">Cars</a>
+                        <a class="nav-link animated-link {% if request.path == '/cars' %}active{% endif %}" href="/cars"><i class="bi bi-car-front-fill"></i>
+                        Cars</a>
                     </li>
                     {% if "Administrator" in session["role"] or "Clerk" in session["role"] %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/rental/list_rentals' %} active {% endif %}" href="/rental/list_rentals">Rentals</a>
+                        <a class="nav-link animated-link {% if request.path == '/rental/list_rentals' %}active {% endif %}" href="/rental/list_rentals"><i class="bi bi-file-earmark-text-fill"></i>
+                        Rentals</a>
                     </li>
                     {% endif %}
                     {% if "Administrator" in session["role"] %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/admin/' %} active {% endif %}" href="/admin">Admin</a>
+                        <a class="nav-link animated-link {% if request.path == '/admin/' %}active{% endif %}" href="/admin"><i class="bi bi-puzzle"></i>
+                        Admin</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/view/' %} active {% endif %}" href="/view">Users</a>
+                        <a class="nav-link animated-link {% if request.path == '/view/' %}active{% endif %}" href="/view"><i class="bi bi-people-fill"></i>
+                        Users</a>
                     </li>
                     {% endif %}
                     {% if session.get("user") %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/account/' %} active {% endif %}" href="/account/">Account</a>
+                        <a class="nav-link animated-link {% if request.path == '/account/' %}active{% endif %}" href="/account/"><i class="bi bi-person-circle"></i>
+                        Account</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/login/' %} active {% endif %} " href="/login">Sign In</a>
+                        <a class="nav-link animated-link {% if request.path == '/login/' %}active{% endif %} " href="/login"><i class="bi bi-box-arrow-in-right"></i>
+                        Sign In</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/register/' %} active {% endif %}" href="/register">Register</a>
+                        <a class="nav-link animated-link {% if request.path == '/register/' %}active{% endif %}" href="/register"><i class="bi bi-person-plus-fill"></i>
+                        Register</a>
                     </li>
                     {% endif %}
                 </ul>

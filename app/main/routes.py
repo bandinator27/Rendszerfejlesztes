@@ -33,7 +33,6 @@ def login():
 
         login_response = login_request.json()
 
-        print(f"Request data: {data}")
         print(f"Login API Status Code: {login_request.status_code}")
         print(f"Login API Response Text: {login_request.text}")
 

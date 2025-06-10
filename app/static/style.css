@@ -10,10 +10,6 @@ body {
     border-right: 1px solid #bbb;
 }
 
-.nav-link:hover {
-    text-decoration: underline;
-}
-
 h1:hover .edit-icon {
     opacity: 1;
 }
@@ -23,4 +19,31 @@ h1:hover .edit-icon {
 }
 .edit-icon:hover {
     opacity: 1;
+}
+
+.nav-item {
+    padding: 0 0.4rem;
+}
+.nav-item:last-child {
+    padding-right: 0;
+}
+
+.animated-link {
+    background-color: #ffffff00;
+    border-radius: 5px;
+}
+.animated-link:hover {
+    background-color: #ffffff26;
+    color: white;
+}
+.animated-link i {
+    padding-right: 0.25rem;
+}
+
+.card {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+.card:hover {
+    transform: translateY(-1rem);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
 }

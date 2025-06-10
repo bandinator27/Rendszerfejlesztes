@@ -28,7 +28,7 @@
 <div class="row row-cols-1 row-cols-md-4 pb-4">
     {% for car in row_items %}
     <div class="col">
-        <div class="card h-100 text-bg-light border-dark">
+        <div class="card h-100 text-bg-light">
             {% set url = "/images/" + car.image_url %}
             <img src="{{ url_for('static', filename=url) }}" class="card-img-top" alt="Car image">
             <div class="card-body">
@@ -41,7 +41,7 @@
             </div>
             <div class="row text-center align-items-center g-0 pb-2">
                 <div class="col-md-4 separator">
-                    <i class="bi bi-person fs-4 d-block"></i>
+                    <i class="bi bi-people fs-4 d-block"></i>
                     <p class="card-text mb-0">{{ car.seats }}</p>
                 </div>
                 <div class="col-md-4 separator">
