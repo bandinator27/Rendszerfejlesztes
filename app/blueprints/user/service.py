@@ -72,9 +72,59 @@ class UserService:
 
 # --- List users
     @staticmethod
-    def list_users():
+    def list_users(request):
+        filter_type = request['filter_type']
+        filterValue = request['filterValue']
         try:
-            user = db.session.query(Users).all()
+            query = Users.query
+            if filter_type:
+                if filter_type == "Username":
+                    query = query.filter(Users.username.ilike(f'%{filterValue}%'))
+                elif filter_type == "Email":
+                    query = query.filter(Users.email.ilike(f'%{filterValue}%'))
+                elif filter_type == "Address":
+                    addresses = db.session.execute(select(Addresses).filter(Addresses.city.ilike(f'%{filterValue}%'))).scalars().all()
+                    user = []
+                    for address in addresses:
+                        user_req = db.session.execute(select(Users).filter(Users.address_id==address.id)).scalar_one_or_none()
+                        user.append(user_req)
+
+                    print(user)
+
+                    addresses = db.session.execute(select(Addresses).filter(Addresses.postalcode.ilike(f'%{filterValue}%'))).scalars().all()
+                    for address in addresses:
+                        user_req = db.session.execute(select(Users).filter(Users.address_id==address.id)).scalar_one_or_none()
+                        user.append(user_req)
+
+                    print(user)
+
+                    addresses = db.session.execute(select(Addresses).filter(Addresses.street.ilike(f'%{filterValue}%'))).scalars().all()
+                    for address in addresses:
+                        user_req = db.session.execute(select(Users).filter(Users.address_id==address.id)).scalar_one_or_none()
+                        user.append(user_req)
+                    
+                    print(user)
+
+                    list(set(user))
+                    print(user)
+
+                elif filter_type == "Phone number":
+                    query = query.filter(Users.phone_number.ilike(f'%{filterValue}%'))
+                elif filter_type == "Roles":
+                    roles = db.session.execute(select(Roles).filter(Roles.role_name.ilike(f'%{filterValue}%'))).scalars().all()
+                    user = []
+                    for role in roles:
+                        user_req = db.session.execute(select(Users).filter(Users.id==role.id)).scalar_one_or_none()
+                        user.append(user_req)
+                else:
+                    pass
+
+            if not filterValue or not filter_type:
+                user = Users.query.all()
+            else:
+                if not filter_type == "Roles" and not filter_type == "Address":
+                    user = query.all()
+
         except Exception as ex:
             return False, f"Database error! (user_view) Details: {ex}"
         return True, UserResponseSchema().dump(user, many=True)
@@ -104,7 +154,8 @@ class UserService:
             if user:
                 user.username = request["username"]
                 user.email = request["email"]
-                user.set_password(request["password"])
+                if request["password"]:
+                    user.set_password(request["password"])
                 user.phone_number = request["phone_number"]
                 address = request["address"]
 
@@ -127,7 +178,7 @@ class UserService:
                     user.address_id = addr.id
 
                 db.session.commit()
-                return True, "You've successfully updated your details!"
+                return True, "User data updated successfully. Log in again to apply changes."
             else:
                 return False, "User not found."
         except Exception as ex:

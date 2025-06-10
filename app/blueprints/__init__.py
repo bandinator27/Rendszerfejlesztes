@@ -8,29 +8,6 @@ from functools import wraps
 
 main_bp = APIBlueprint('main', __name__, tag="main")
 
-#@auth.verify_token
-#def verify_token(token):
-#    if not token:
-#        token = request.cookies.get('access_token')
-#        print("DEBUG: Retrieved token from cookie.")
-#
-#    if not token:
-#        print("DEBUG: No token found in header or cookie.")
-#        return None
-#
-#    try:
-#        print(f"DEBUG: Verifying token: {token}")
-#        data = jwt.decode(token.encode('ascii'), current_app.config['SECRET_KEY'])
-#        user_id = data.get("user_id")
-#        print(f"DEBUG: Token user_id: {user_id}")
-#        if user_id:
-#            return Users.query.get(user_id)
-#        return None
-#
-#    except Exception as e:
-#        print(f"DEBUG: Token error: {e}")
-#        return None
-
 def set_auth_headers(token):
     return {
         'Authorization': f'Bearer {token}',
@@ -55,7 +32,7 @@ def role_required(roles):
         @wraps(fn)
         def decorated_function(*args, **kwargs):
             user_roles = auth.current_user.get("roles")
-            print(user_roles)
+            #print(user_roles)
             for role in roles:
                 for user_role in user_roles:
                     if role in user_role['role_name']:

@@ -23,3 +23,7 @@ class RentalRequestSchema(Schema):
     @staticmethod
     def parse_date(date_str):
         return datetime.strptime(date_str, '%Y-%m-%d')
+    
+class RentalsFilterSchema(Schema):
+    filter_type = String()
+    filterValue = String()

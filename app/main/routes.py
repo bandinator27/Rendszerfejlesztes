@@ -1,14 +1,11 @@
 from flask import redirect, url_for, render_template, request, session, flash, make_response
 from app.extensions import db
-from app.models.addresses import Addresses
-from app.blueprints.user.schemas import PayloadSchema, RoleSchema
 from app.blueprints import main_bp, verify_token, set_auth_headers
 from app.models.cars import *
 from app.models.rentals import *
 from app.models.roles import *
 from app.models.users import *
 from werkzeug.security import generate_password_hash
-from sqlalchemy import select
 from app.forms.loginform import LoginForm
 from app.forms.registerform import RegisterForm
 import requests
@@ -31,16 +28,18 @@ def login():
                             'password': form.password.data
                         })
 
+        if login_request.status_code != 200:
+            flash("Incorrect username or password. Please try again!", "danger")
+            return render_template('login.html', name='Sign In', form=form)
+        
         login_response = login_request.json()
 
-        print(f"Login API Status Code: {login_request.status_code}")
-        print(f"Login API Response Text: {login_request.text}")
-
         if not login_response["token"]:
-            flash("Wrong username or password!", "danger")
+            flash("Incorrect username or password. Please try again!", "danger")
             return redirect("/login")
         
         session['user'] = login_response["username"]
+        session['user_id'] = login_response["id"]
 
         data = verify_token(login_response["token"])
 
@@ -50,11 +49,12 @@ def login():
 
         session['role'] = role_list
         print(session['role'])
-        if 'Administrator' in session['role']:
+        if 'Administrator' in session.get('role'):
             print('Admin yaaay!')
-
-        if 'User' in session['role']:
+        if 'User' in session.get('role'):
             print('User yaay!')
+        if 'Clerk' in session.get('role'):
+            print('Clerk yaay!')
 
         resp = make_response(redirect(url_for('main.home')))
         resp.set_cookie('access_token', login_response["token"])
@@ -90,30 +90,6 @@ def register():
         return redirect(url_for('main.login'))
 
     return render_template('register.html', form=form)
-
-# --- List users for testing
-@main_bp.route("/view/")
-def view():
-    if session["user"]:
-        if "Administrator" in session["role"]:
-            token = request.cookies.get('access_token')
-            users = requests.get('http://localhost:5000/user/list_users', headers=set_auth_headers(token))
-            print(users.json())
-            #return redirect(url_for("main.home"))
-            roles = []
-            for user in users.json():
-               user_data = requests.get('http://localhost:5000/user/get/roles/'+str(user["id"]), headers=set_auth_headers(token))
-               data = ''
-               for role in user_data.json():
-                   if not len(data) < 1:
-                       data = data + ', ' + role['role_name']
-                   else:
-                       data = role['role_name']
-               roles.append(data)
-
-            print(roles)
-            return render_template('view.html', users=users.json(), roles=roles)
-    return redirect(url_for("main.home")) 
 
 # --- List cars
 @main_bp.route('/cars', methods=['GET'], strict_slashes=False)
@@ -180,6 +156,8 @@ def logout():
         session.pop("user", None)
     if "role" in session:
         session.pop("role", None)
+    if "user_id" in session:
+        session.pop("id", None)
 
     response.delete_cookie('access_token')
 

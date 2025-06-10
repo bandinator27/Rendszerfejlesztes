@@ -2,6 +2,7 @@
 from app.blueprints.rentals.schemas import RentalsSchema
 from app.models.rentals import Rentals
 from app.models.cars import Cars
+from app.models.users import Users
 from sqlalchemy import select
 from datetime import datetime
 
@@ -11,19 +12,96 @@ class RentalsService:
     @staticmethod
     def view_rentals():
         try:
-            rentals = db.session.query(Rentals).all()
+            rental_pending= db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Pending')).scalars().all()
+            rental_rented = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Rented')).scalars().all()
+            rental_returned = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Returned')).scalars().all()
+            rentals = rental_pending+rental_rented+rental_returned
+            #rentals = db.session.query(Rentals).all()
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rentals, many=True)
     
     @staticmethod
+    def filter_rentals(request):
+        filter_type = request['filter_type']
+        filterValue = request['filterValue']
+
+        try:
+            query = Rentals.query
+
+            if filter_type:
+                if filter_type == "Numberplate":
+                    car = db.session.execute(select(Cars).filter(Cars.numberplate.ilike(f'%{filterValue}%'))).scalar_one_or_none()
+                    query = query.filter(Rentals.carid == car.carid)
+                elif filter_type == "Username":
+                    user = db.session.execute(select(Users).filter(Users.username.ilike(f'%{filterValue}%'))).scalar_one_or_none()
+                    query = query.filter(Rentals.renterid == user.id)
+                elif filter_type == "Start date":
+                    query = query.filter(Rentals.rentstart.ilike(f'%{filterValue}%'))
+                elif filter_type == "Status":
+                    query = query.filter(Rentals.rentstatus.ilike(f'%{filterValue}%'))
+                elif filter_type == "Length (Maximum)":
+                    try:
+                        max_length = float(filterValue)
+                        query = query.filter(Rentals.rentduration <= max_length)
+                    except ValueError:
+                        query = Rentals.query.all()
+                elif filter_type == "Length (Minimum)":
+                    try:
+                        min_length = float(filterValue)
+                        query = query.filter(Rentals.rentduration >= min_length)
+                    except ValueError:
+                        query = Rentals.query.all()
+                elif filter_type == "Price (Maximum)":
+                    try:
+                        max_price = float(filterValue)
+                        query = query.filter(Rentals.rentprice <= max_price)
+                    except ValueError:
+                        query = Rentals.query.all()
+                elif filter_type == "Price (Minimum)":
+                    try:
+                        min_price = float(filterValue)
+                        query = query.filter(Rentals.rentprice >= min_price)
+                    except ValueError:
+                        query = Rentals.query.all()
+                else:
+                    pass
+
+            if not filterValue or not filter_type:
+                rental_pending = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Pending')).scalars().all()
+                rental_rented = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Rented')).scalars().all()
+                rental_returned = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Returned')).scalars().all()
+                rentals = rental_pending+rental_rented+rental_returned
+            else:
+                #rentals = query.all()
+                rentals_pending = query.filter(Rentals.rentstatus == 'Pending').all()
+                rentals_rented = query.filter(Rentals.rentstatus == 'Rented').all()
+                rentals_returned = query.filter(Rentals.rentstatus == 'Returned').all()
+                rentals = rentals_pending + rentals_rented + rentals_returned
+
+        except Exception as ex:
+            return False, f"Database or server error! Details: {ex}"
+        return True, RentalsSchema().dump(rentals, many=True)
+    
+    @staticmethod
     def view_rentals_user(user_id):
         try:
-            rental = db.session.execute(select(Rentals).filter(Rentals.renterid == user_id)).scalars().all()
+            rental_pending = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Pending', Rentals.renterid == user_id)).scalars().all()
+            rental_rented = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Rented', Rentals.renterid == user_id)).scalars().all()
+            rental_returned = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Returned', Rentals.renterid == user_id)).scalars().all()
+            rental = rental_pending+rental_rented+rental_returned
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rental, many=True)
-
+    
+    @staticmethod
+    def rental_get_user(user_id, cid):
+        try:
+            rental = db.session.execute(select(Rentals).filter(Rentals.rentalid == cid, Rentals.renterid == user_id)).scalar_one_or_none()
+        except Exception as ex:
+            return False, f"Database error! Details: {ex}"
+        return True, RentalsSchema().dump(rental)
+    
 # --- RENTING
     @staticmethod
     def rent_car(carid, request):
@@ -106,6 +184,26 @@ class RentalsService:
 # --- STOP RENTAL
     @staticmethod
     def stop_rental(rentalid):
+        try:
+            rental = db.session.get(Rentals, rentalid)
+            if rental is None:
+                return False, "This rental does not exist."
+
+            rental.rentstatus = "Returned"
+
+            car = db.session.get(Cars, rental.carid)
+            if car:
+                car.rentable = 1
+
+            db.session.commit()
+
+        except Exception as ex:
+            return False, f"Database error! Details: {ex}"
+        return True, "Rental stopped, car marked as available."
+    
+# --- DELETE RENTAL
+    @staticmethod
+    def delete_rental(rentalid):
         try:
             rental = db.session.get(Rentals, rentalid)
             if rental is None:
