@@ -16,9 +16,7 @@
                 <th>Price</th>
                 <th>Start date</th>
                 <th>Status</th>
-                {% if is_admin or is_clerk %}
                 <th>Actions</th>
-                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -34,7 +32,6 @@
                 <td>{{ rental.rentprice }}</td>
                 <td>{{ rental.rentstart[:10] }}</td>
                 <td>{{ rental.rentstatus }}</td>
-                {% if is_admin or is_clerk %}
                 <td>
                     {% if rental.rentstatus == "Pending" %}
                     <form action="{{ url_for('main.rentals.approve_rental_form', rentalid=rental.rentalid) }}" method="post">
@@ -46,8 +43,12 @@
                         <button class="btn btn-danger btn-sm stop-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">Stop</button>
                     </form>
                     {% endif %}
+                    {% if rental.rentstatus == "Returned" %}
+                    <form action="{{ url_for('main.rentals.delete_rental_form', rentalid=rental.rentalid) }}" method="post">
+                        <button class="btn btn-danger btn-sm delete-btn" data-carid="{{ rental.carid }}" data-renterid="{{ rental.renterid }}">Delete</button>
+                    </form>
+                    {% endif %}
                 </td>
-                {% endif %}
             </tr>
             {% endfor %}
             {% else %}

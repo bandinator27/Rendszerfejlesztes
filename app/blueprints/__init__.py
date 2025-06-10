@@ -55,7 +55,7 @@ def role_required(roles):
         @wraps(fn)
         def decorated_function(*args, **kwargs):
             user_roles = auth.current_user.get("roles")
-            print(user_roles)
+            #print(user_roles)
             for role in roles:
                 for user_role in user_roles:
                     if role in user_role['role_name']:

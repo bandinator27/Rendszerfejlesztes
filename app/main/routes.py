@@ -31,19 +31,24 @@ def login():
                             'password': form.password.data
                         })
 
+        if login_request.status_code != 200:
+            flash("Wrong username or password!", "info")
+            return render_template('login.html', name='Sign In', form=form)
+        
         login_response = login_request.json()
-
-        print(f"Request data: {data}")
-        print(f"Login API Status Code: {login_request.status_code}")
-        print(f"Login API Response Text: {login_request.text}")
 
         if not login_response["token"]:
             flash("Wrong username or password!", "danger")
             return redirect("/login")
         
         session['user'] = login_response["username"]
+        session['user_id'] = login_response["id"]
 
         data = verify_token(login_response["token"])
+
+        print(f"Request data: {data}")
+        print(f"Login API Status Code: {login_request.status_code}")
+        print(f"Login API Response Text: {login_request.text}")
 
         role_list = []
         for role in data["roles"]:
@@ -99,8 +104,7 @@ def view():
         if "Administrator" in session["role"]:
             token = request.cookies.get('access_token')
             users = requests.get('http://localhost:5000/user/list_users', headers=set_auth_headers(token))
-            print(users.json())
-            #return redirect(url_for("main.home"))
+
             roles = []
             for user in users.json():
                user_data = requests.get('http://localhost:5000/user/get/roles/'+str(user["id"]), headers=set_auth_headers(token))
@@ -112,7 +116,6 @@ def view():
                        data = role['role_name']
                roles.append(data)
 
-            print(roles)
             return render_template('view.html', users=users.json(), roles=roles)
     return redirect(url_for("main.home")) 
 
@@ -181,6 +184,8 @@ def logout():
         session.pop("user", None)
     if "role" in session:
         session.pop("role", None)
+    if "user_id" in session:
+        session.pop("id", None)
 
     response.delete_cookie('access_token')
 

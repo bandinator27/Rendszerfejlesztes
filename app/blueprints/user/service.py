@@ -104,7 +104,8 @@ class UserService:
             if user:
                 user.username = request["username"]
                 user.email = request["email"]
-                user.set_password(request["password"])
+                if request["password"]:
+                    user.set_password(request["password"])
                 user.phone_number = request["phone_number"]
                 address = request["address"]
 

@@ -166,6 +166,186 @@ db.session.add_all([
             rentprice=1500,
             renteraddress="Budapest, József A. utca 6.",
             renterphonenum="+36701234568"
+        ),
+        Rentals(
+            carid=21,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=3,
+            rentprice=200,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=20,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Pending",
+            rentduration=4,
+            rentprice=600,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=19,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=7,
+            rentprice=550,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=18,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Rented",
+            rentduration=8,
+            rentprice=210,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=17,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=5,
+            rentprice=665,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=16,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Pending",
+            rentduration=50,
+            rentprice=5000,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=15,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=15,
+            rentprice=320,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=14,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Pending",
+            rentduration=2,
+            rentprice=122,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=13,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=5,
+            rentprice=300,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=12,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=8,
+            rentprice=200,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=11,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=1,
+            rentprice=100,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=10,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Pending",
+            rentduration=9,
+            rentprice=750,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=9,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=6,
+            rentprice=550,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=8,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Pending",
+            rentduration=7,
+            rentprice=630,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=7,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=3,
+            rentprice=250,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=6,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-09", "%Y-%m-%d"),
+            rentstatus="Rented",
+            rentduration=5,
+            rentprice=500,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=5,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-08", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=4,
+            rentprice=350,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
+        ),
+        Rentals(
+            carid=4,
+            renterid=3,
+            rentstart=datetime.strptime("2025-06-19", "%Y-%m-%d"),
+            rentstatus="Returned",
+            rentduration=12,
+            rentprice=1250,
+            renteraddress="Balatonlelle, Kossuth utca 12.",
+            renterphonenum="+36201234567"
         )])
 
 db.session.commit()

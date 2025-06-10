@@ -16,7 +16,7 @@ class Users(db.Model):
     phone_number: Mapped[str] = mapped_column(String(32))
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        self.password = generate_password_hash(self.username[::-1]+password)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)

@@ -1,6 +1,7 @@
-﻿from flask import request, redirect, url_for, flash, current_app, render_template
+﻿from flask import request, redirect, url_for, flash, current_app, render_template, session
 from apiflask import HTTPError
 from app.models.rentals import Rentals
+from app.blueprints import set_auth_headers, verify_token
 from app.blueprints.rentals import rental_bp
 from app.blueprints.rentals.service import RentalsService
 from app.blueprints.rentals.schemas import RentalsSchema, RentalRequestSchema
@@ -11,42 +12,41 @@ from app.blueprints import role_required
 from app.extensions import db
 from datetime import datetime, timedelta
 from authlib.jose import jwt
+import requests
 
-# @rental_bp.route('/')
-# def index():
-#     return 'This is the rentals Blueprint'
+# --- View rentals
+@rental_bp.get('/api/view_rentals')
+@rental_bp.doc(tags=["rentals"])
+@rental_bp.output(RentalsSchema(many = True))
+@rental_bp.auth_required(auth)
+@role_required(["Clerk", "Administrator"])
+def view_rentals_api():
+    print('called')
+    success, response = RentalsService.view_rentals()
+    if success:
+        return response, 200
+    raise HTTPError(message=response, status_code=400)
 
 # --- View rentals
 @rental_bp.route('/list_rentals')
 def view_rentals():
-    token = request.cookies.get('access_token')
-    if not token:
-        flash("Looks like you're not signed in. Sign in first!", "warning")
-        return redirect(url_for('main.login'))
-    try:
-        public_key = current_app.config['PUBLIC_KEY']
-        claims = jwt.decode(token, public_key)
-        claims.validate()
-    except Exception as ex:
+
+    if not session['user_id']:
         flash("Looks like you're not signed in. Sign in first!", "danger")
-        return redirect(url_for('main.logout'))
+        return redirect(url_for('main.home'))
+
+    if not 'Administrator' in session['role'] and not 'Clerk' in session['role']:
+        flash("You don't have permission to view this!", "danger")
+        return redirect(url_for('main.home'))
     
-    user_roles = claims.get("roles", [])
-    role_names = [role_dict.get('role_name') for role_dict in user_roles if role_dict.get('role_name')]
+    token = request.cookies.get('access_token')
+    response = requests.get('http://localhost:5000/rental/api/view_rentals', headers=set_auth_headers(token))
+    rentals = response.json()
 
-    if "Administrator" in role_names or "Clerk" in role_names:
-        success, rentals = RentalsService.view_rentals()
-        is_admin = True if "Administrator" in role_names else False
-        is_clerk = True if "Clerk" in role_names else False
-    else:
-        success, rentals = RentalsService.view_rentals()
-
-    if not success:
-        flash(rentals, "danger")
+    if response.status_code != 200:
         rentals = []
 
-    import requests
-    from app.blueprints import set_auth_headers
+    token = request.cookies.get('access_token')
     numberplates = []
     for rental in rentals:
         car_data = requests.get('http://localhost:5000/car/view/'+str(rental["carid"]), headers=set_auth_headers(token))
@@ -55,10 +55,9 @@ def view_rentals():
     usernames = []
     for rental in rentals:
         user_data = requests.get('http://localhost:5000/user/get/'+str(rental["renterid"]), headers=set_auth_headers(token))
-        print(user_data.json())
         usernames.append(user_data.json()['username'])
 
-    return render_template('rentals.html', rentals=rentals, is_admin=is_admin, is_clerk=is_clerk, numberplates=numberplates, usernames=usernames)
+    return render_template('rentals.html', rentals=rentals, numberplates=numberplates, usernames=usernames)
 
 # --- View rentals for a user
 @rental_bp.get('/view_rentals_user')
@@ -78,14 +77,6 @@ def rent_car_form(cid):
         token = request.cookies.get('access_token')
         if not token:
             flash("Looks like you're not signed in. Sign in first!", "warning")
-            return redirect(url_for('main.login'))
-
-        try:
-            public_key = current_app.config['PUBLIC_KEY']
-            claims = jwt.decode(token, public_key)
-            claims.validate()
-        except Exception as ex:
-            flash("Unauthorized: Invalid token!", "danger")
             return redirect(url_for('main.login'))
 
         data = request.form.to_dict()
@@ -113,7 +104,11 @@ def rent_car_form(cid):
             flash("Rental duration must be at least 1 day.", "warning")
             return redirect(url_for('main.cars'))
 
-        user_id = claims.get('user_id')
+        if not session['user_id']:
+            flash("You are not logged in!", "danger")
+            return redirect(url_for('main.login'))
+        
+        user_id = session['user_id']
         user = db.session.get(Users, user_id)
         if not user:
             flash("User not found.", "danger")
@@ -165,6 +160,7 @@ def rent_car_form(cid):
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.input(RentalRequestSchema, location="json")
 @rental_bp.auth_required(auth)
+@role_required(["Clerk", "Administrator"])
 def rent_car(cid, json_data):
     try:
         # Get user ID from the JWT token, other details from the database
@@ -194,7 +190,7 @@ def rent_car(cid, json_data):
 @rental_bp.doc(tags=["rentals"])
 @rental_bp.input(RentalsSchema, location="json")
 @rental_bp.auth_required(auth)
-#@role_required(["User"])
+@role_required(["Clerk", "Administrator"])
 def set_car_rentstatus(cid, json_data):
     success, response = RentalsService.set_car_rentstatus(cid, json_data)
     if success:
@@ -207,7 +203,6 @@ def set_car_rentstatus(cid, json_data):
 @rental_bp.auth_required(auth)
 @role_required(["Clerk", "Administrator"])
 def approve_rental(rentalid):
-    # renterid = json_data.get("renterid")
     success, response = RentalsService.approve_rental(rentalid)
     if success:
         return response, 200
@@ -216,25 +211,20 @@ def approve_rental(rentalid):
 @rental_bp.route('/approve/<int:rentalid>', methods=["POST"])
 @rental_bp.doc(tags=["rentals"])
 def approve_rental_form(rentalid):
-    try:
-        token = request.cookies.get('access_token')
-        if not token:
-            flash("Looks like you're not signed in. Sign in first!", "warning")
-            return redirect(url_for('main.login'))
-        try:
-            public_key = current_app.config['PUBLIC_KEY']
-            claims = jwt.decode(token, public_key)
-            claims.validate()
-        except Exception as ex:
-            flash("Unauthorized: Invalid token!", "danger")
-            return redirect(url_for('main.rentals.view_rentals'))
-    except Exception as ex:
-        flash(f"Error processing rental: {ex}", "danger")
-        return redirect(url_for('main.rentals.view_rentals'))
-    success, response = RentalsService.approve_rental(rentalid)
-    if success:
+    if not session['user_id']:
+        flash("Looks like you're not signed in. Sign in first!", "warning")
+        return redirect(url_for('main.login'))
+    
+    token = request.cookies.get('access_token')
+    response = requests.post('http://localhost:5000/rental/api/approve/'+str(rentalid), headers=set_auth_headers(token))
+
+    #success, response = RentalsService.approve_rental(rentalid)
+    if response.status_code == 200:
         flash("Rental approved!", "success")
-        return redirect(url_for('main.rentals.view_rentals'))
+    else:
+        flash("Something went wrong!", "danger")
+
+    return redirect(url_for('main.rentals.view_rentals'))
 
 # --- Stop a rental
 @rental_bp.post('/api/stop/<int:rentalid>')
@@ -242,7 +232,7 @@ def approve_rental_form(rentalid):
 @role_required(["Clerk", "Administrator"])
 def stop_rental(rentalid):
     try:
-        success, response = RentalsService.set_car_rentstatus(rentalid, {"rentstatus": "Available"})
+        success, response = RentalsService.stop_rental(rentalid)
         if success:
             return response, 200
         raise HTTPError(message=response, status_code=400)
@@ -253,21 +243,58 @@ def stop_rental(rentalid):
 @rental_bp.doc(tags=["rentals"])
 def stop_rental_form(rentalid):
     try:
-        token = request.cookies.get('access_token')
-        if not token:
+        if not session['user_id']:
             flash("Looks like you're not signed in. Sign in first!", "warning")
             return redirect(url_for('main.login'))
-        public_key = current_app.config['PUBLIC_KEY']
-        claims = jwt.decode(token, public_key)
-        claims.validate()
         
-        success, response = RentalsService.stop_rental(rentalid)
-    
-        if success:
+        token = request.cookies.get('access_token')
+        response = requests.post('http://localhost:5000/rental/api/stop/'+str(rentalid), headers=set_auth_headers(token))
+
+        if response.status_code == 200:
             flash("The rental has ended!", "success")
-            return redirect(url_for('main.rentals.view_rentals'))
         else:
-            flash(response, "danger")
+            flash("Something went wrong!", "danger")
+
+        #success, response = RentalsService.stop_rental(rentalid)
+        return redirect(url_for('main.rentals.view_rentals'))
+    
+    except Exception as ex:
+        flash(f"Error processing rental: {ex}", "danger")
+        
+    return redirect(url_for('main.rentals.view_rentals'))
+
+# --- Delete a rental
+@rental_bp.post('/api/delete/<int:rentalid>')
+@rental_bp.auth_required(auth)
+@role_required(["Clerk", "Administrator"])
+def delete_rental(rentalid):
+    try:
+        success, response = RentalsService.delete_rental(rentalid)
+        if success:
+            return response, 200
+        raise HTTPError(message=response, status_code=400)
+    except Exception as ex:
+        return {"message": f"Error: {ex}"}, 400
+
+@rental_bp.route('/delete/<int:rentalid>', methods=["POST"])
+@rental_bp.doc(tags=["rentals"])
+def delete_rental_form(rentalid):
+    try:
+        if not session['user_id']:
+            flash("Looks like you're not signed in. Sign in first!", "warning")
+            return redirect(url_for('main.login'))
+        
+        token = request.cookies.get('access_token')
+        response = requests.post('http://localhost:5000/rental/api/delete/'+str(rentalid), headers=set_auth_headers(token))
+
+        if response.status_code == 200:
+            flash("The rental has been deleted!", "success")
+        else:
+            flash("Something went wrong!", "danger")
+
+        #success, response = RentalsService.delete_rental(rentalid)
+        return redirect(url_for('main.rentals.view_rentals'))
+    
     except Exception as ex:
         flash(f"Error processing rental: {ex}", "danger")
         

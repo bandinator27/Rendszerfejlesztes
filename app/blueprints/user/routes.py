@@ -6,7 +6,7 @@ from app.blueprints.user.schemas import RoleSchema
 from apiflask import HTTPError
 from app.blueprints.user.service import UserService
 from app.extensions import auth
-from flask import redirect, url_for, request, flash
+from flask import redirect, url_for, request, flash, session
 
 # @user_bp.route('/')
 # def index():
@@ -60,7 +60,7 @@ def user_view():
 @user_bp.doc(tags=["user"])
 @user_bp.output(UserResponseSchema())
 @user_bp.auth_required(auth)
-@role_required(["Administrator", "Clerk"])
+@role_required(["Administrator"])
 def get_user_data(uid):
     success, response = UserService.get_user_data(uid)
     if success:
@@ -72,7 +72,7 @@ def get_user_data(uid):
 @user_bp.doc(tags=["user"])
 @user_bp.input(UserRequestSchema, location="json")
 @user_bp.auth_required(auth)
-@role_required(["Clerk", "Administrator"])
+@role_required(["Administrator"])
 def set_user_data(uid, json_data):
     current_user_id = auth.current_user.get("user_id")
     if current_user_id != uid and not set(auth.current_user.get("roles", [])) & {"Administrator"}:
@@ -97,6 +97,15 @@ def edit_user_data(uid):
             "street": form.get("street")
         }
     }
+
+    if not session['user_id']:
+        flash("You are not logged in!", "warning")
+        return redirect(url_for("main.account"))
+
+    if session['user_id'] != uid and not 'Administrator' in session['role']:
+        flash("You shouldn't edit someone else's account!", "warning")
+        return redirect(url_for("main.account"))
+    
     success, response = UserService.set_user_data(uid, json_data)
     if success:
         flash(response, "success")

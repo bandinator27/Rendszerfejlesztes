@@ -11,7 +11,11 @@ class RentalsService:
     @staticmethod
     def view_rentals():
         try:
-            rentals = db.session.query(Rentals).all()
+            rental_pending= db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Pending')).scalars().all()
+            rental_rented = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Rented')).scalars().all()
+            rental_returned = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Returned')).scalars().all()
+            rentals = rental_pending+rental_rented+rental_returned
+            #rentals = db.session.query(Rentals).all()
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rentals, many=True)
@@ -19,7 +23,10 @@ class RentalsService:
     @staticmethod
     def view_rentals_user(user_id):
         try:
-            rental = db.session.execute(select(Rentals).filter(Rentals.renterid == user_id)).scalars().all()
+            rental_pending= db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Pending', Rentals.renterid == user_id)).scalars().all()
+            rental_rented = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Rented', Rentals.renterid == user_id)).scalars().all()
+            rental_returned = db.session.execute(select(Rentals).filter(Rentals.rentstatus == 'Returned', Rentals.renterid == user_id)).scalars().all()
+            rental = rental_pending+rental_rented+rental_returned
         except Exception as ex:
             return False, f"Database error! Details: {ex}"
         return True, RentalsSchema().dump(rental, many=True)
@@ -106,6 +113,26 @@ class RentalsService:
 # --- STOP RENTAL
     @staticmethod
     def stop_rental(rentalid):
+        try:
+            rental = db.session.get(Rentals, rentalid)
+            if rental is None:
+                return False, "This rental does not exist."
+
+            rental.rentstatus = "Returned"
+
+            car = db.session.get(Cars, rental.carid)
+            if car:
+                car.rentable = 1
+
+            db.session.commit()
+
+        except Exception as ex:
+            return False, f"Database error! Details: {ex}"
+        return True, "Rental stopped, car marked as available."
+    
+# --- DELETE RENTAL
+    @staticmethod
+    def delete_rental(rentalid):
         try:
             rental = db.session.get(Rentals, rentalid)
             if rental is None:
