@@ -140,7 +140,6 @@ def add_car_form():
 @car_bp.doc(tags=["car"])
 def edit_car_form(cid):
     form_data = request.form.to_dict()
-    #form_data['rentable'] = 1
     token = request.cookies.get('access_token')
     if not token:
         flash("Looks like you're not signed in. Sign in first!", "danger")
@@ -213,7 +212,7 @@ def filter_car(json_data):
 def del_car_form(cid):
     token = request.cookies.get('access_token')
     if not token:
-        flash("Looks like you're not signed in. Sign in first!", "danger")
+        flash("Looks like you're not signed in. Sign in first!", "warning")
         return redirect(url_for('main.login'))
     try:
         public_key = current_app.config['PUBLIC_KEY']
@@ -225,13 +224,13 @@ def del_car_form(cid):
     user_roles = [r['role_name'] for r in claims.get('roles', [])]
     if "Administrator" not in user_roles:
         flash("You don't have permission to delete a car!", "warning")
-        return redirect(url_for('main.cars'))
+        return redirect(url_for('main.admin_page'))
 
     success, message = CarsService.remove_car(cid)
 
     if success:
         flash(message, "success")
-        return redirect(url_for('main.cars'))
+        return redirect(url_for('main.admin_page'))
     else:
         flash(message, "danger")
-        return redirect(url_for('main.cars'))
+        return redirect(url_for('main.admin_page'))

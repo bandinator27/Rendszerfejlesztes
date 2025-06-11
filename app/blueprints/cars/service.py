@@ -143,8 +143,7 @@ class CarsService:
                 Rentals.rentstatus.in_(["Rented", "Pending", "Returned"])
             )).scalars().all()
         if active_rental:
-            return False, "Car cannot be deleted: currently rented, pending rental or needed for logging reasons."
-
+            return False, "This car cannot be deleted. It's currently rented, pending approval or needed for logging reasons."
         try:
             # 3. Delete the car
             db.session.delete(car)

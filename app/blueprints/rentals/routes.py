@@ -116,7 +116,7 @@ def rent_car_form(cid):
     try:
         token = request.cookies.get('access_token')
         if not token:
-            flash("You have to be signed in to rent a car!", "warning")
+            flash("You have to be signed in to rent a car. Register if you don't have an account!", "warning")
             return redirect(url_for('main.login'))
 
         data = request.form.to_dict()
@@ -134,7 +134,7 @@ def rent_car_form(cid):
         try:
             rent_start_dt = datetime.strptime(rentstart, "%Y-%m-%d")
             if rent_start_dt.date() < datetime.now().date():
-                flash("Time travel has not been invented yet so you have to pick a date in the present.", "warning")
+                flash("Time travel has not yet been invented so you have to pick a date in the present.", "warning")
                 return redirect(url_for('main.cars'))
         except ValueError as ve:
             flash("Invalid date format. Please use the date picker.", "warning")
